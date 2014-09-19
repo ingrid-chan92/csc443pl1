@@ -3,6 +3,8 @@
 #include <string.h>
 #include <vector>
 
+static const int ATTR_SIZE = 10;
+
 typedef const char* V;
 typedef std::vector<V> Record;
 
