@@ -1,18 +1,28 @@
-#include <stdlib.h>
-#include <sys/timeb.h>
+#include "library.h"
 
-void random_array(char *array, long n) {
-    srand(0);
-    for(int i=0; i < n; i++) {
-        char c = 'A' + (rand() % 26);
-        array[i] = c;
-    }
-    return;
+/**
+ * Compute the number of bytes required to serialize record
+ */
+int fixed_len_sizeof(Record *record) {
+	long size = 0;	
+	for(int i = 0; i < (*record).size(); i++) {
+		size += strlen((*record)[i]);    		
+	}
+	return size;
 }
 
-long now() {
-    struct timeb t;
-    ftime(&t);
-    long ms = t.time * 1000 + t.millitm;
-    return ms;
+/**
+ * Serialize the record to a byte array to be stored in buf.
+ */
+void fixed_len_write(Record *record, void *buf) {
+
 }
+
+/**
+ * Deserializes `size` bytes from the buffer, `buf`, and
+ * stores the record in `record`.
+ */
+void fixed_len_read(void *buf, int size, Record *record) {
+
+}
+
