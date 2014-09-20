@@ -4,7 +4,11 @@
  * Compute the number of bytes required to serialize record
  */
 int fixed_len_sizeof(Record *record) {
-	return (*record).size() * ATTR_SIZE;
+	int size = 0;
+	for(int i = 0; i < (*record).size(); i++) {	
+		 size += strlen((*record)[i]);
+	}
+	return size;
 }
 
 /**

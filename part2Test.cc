@@ -11,13 +11,13 @@ void testerMethod() {
 	printf("size %d \n\n", fixed_len_sizeof(&record));
     	
 	// write test
-	void *wBuff = malloc(fixed_len_sizeof(&record));
+	void *wBuff = malloc(40);
 	fixed_len_write(&record, wBuff);
 	printf("Write %s \n\n", (char *) wBuff);
 
 	// read test	
 	Record rRecord;
-	fixed_len_read(wBuff, fixed_len_sizeof(&record), &rRecord);
+	fixed_len_read(wBuff, 40, &rRecord);
 		
 	for(int i = 0; i < rRecord.size(); i++) {
 		printf("Read %s \n", rRecord[i]);
