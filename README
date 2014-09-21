@@ -1,5 +1,15 @@
+PL1 by 
+
+Ingrid Chan
+c0chanin
+
+Tony Hong
+c1hongxu
+
 2:
-- Relevant code can be found in recordLib.cc and recordLib.h
+- Relevant files:
+	- recordLib.cc
+	- recordLib.h
 
 2.3
 - 100 attributes * 10 bytes = 1000 bytes per record
@@ -9,3 +19,8 @@
 		record.push_back("0123456789");
 	}
 	printf("%d \n", fixed_len_sizeof(&record));
+
+4:
+- Relevant files 
+	- heapfileLib.h 
+	- heapfileLib.cc
