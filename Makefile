@@ -7,4 +7,4 @@ recordLib.o: recordLib.cc recordLib.h
 	$(CC) -o recordLib.o -c recordLib.cc
 
 clean:
-	rm -f part2Test *.o *.out
+	rm -f part2Test *.o
