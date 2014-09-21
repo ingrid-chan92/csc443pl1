@@ -1,11 +1,11 @@
-#include "library.h"
+#include "recordLib.h"
 
 void testerMethod() {
 	Record record;
-	record.push_back("000000000");
-	record.push_back("111111111");
-	record.push_back("222222222");
-	record.push_back("333333333");
+	record.push_back("0000000000");
+	record.push_back("1111111111");
+	record.push_back("2222222222");
+	record.push_back("3333333333");
 
 	// len test
 	printf("size %d \n\n", fixed_len_sizeof(&record));
@@ -27,14 +27,13 @@ void testerMethod() {
 void experiment() {
 	Record record;
 	for (int i = 0; i < 100; i++) {
-		record.push_back((char *) malloc(10));
+		record.push_back((V) malloc(10));
 	}
 
 	printf("%d \n", fixed_len_sizeof(&record));
 }
 
 int main(int argc, char **argv) {
-
 	testerMethod();
 	
 	return 0;

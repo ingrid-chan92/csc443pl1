@@ -1,11 +1,10 @@
 CC = g++
 
-part2Test: part2Test.cc library.o
-	$(CC) -o $@ $< library.o
+part2Test: part2Test.cc recordLib.o
+	$(CC) -o $@ $< recordLib.o
 
-library.o: library.cc library.h
-	$(CC) -o library.o -c library.cc
+recordLib.o: recordLib.cc recordLib.h
+	$(CC) -o recordLib.o -c recordLib.cc
 
 clean:
 	rm -f part2Test *.o *.out
-
