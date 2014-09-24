@@ -137,7 +137,7 @@ void write_fixed_len_page(Page *page, int slot, Record *r) {
 * Read a record from the page from a given slot.
 */
 void read_fixed_len_page(Page *page, int slot, Record *r) {
-		int slot_byte = slot / 8;
+	int slot_byte = slot / 8;
 	int slot_pos = slot % 8;
 	char *slot_ptr = (char *)page->data+page->page_size-slot_byte;
 	void *a = slot_ptr;
