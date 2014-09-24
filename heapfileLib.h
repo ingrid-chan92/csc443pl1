@@ -1,17 +1,7 @@
 #include <stdio.h>
-
-// REPLACE WITH pageLib.h 
-#include "recordLib.h"
+#include "pageLib.h"
 
 typedef int PageID;
-
-// REMOVE THIS WHEN PAGE DATA IS COMMITED
-typedef struct {
-void *data;
-int page_size;
-int slot_size;
-} Page;
-
 
 typedef struct {
     FILE *file_ptr;
@@ -21,12 +11,12 @@ typedef struct {
     
 typedef struct {
 	int page_id;
-    int slot;
+    	int slot;
 
 } RecordID;
 
 typedef struct {
-	PageID page_id; // same as page_offset
+	PageID page_offset;
 	int freespace;
 
 } DirEntry;
@@ -38,4 +28,6 @@ void write_page(Page *page, Heapfile *heapfile, PageID pid);
 
 // Helper functions
 void writeDirectoryPage(FILE *file, int page_size);
-PageID _alloc_page(Heapfile *heapfile, int dirPageID);
+void findEntryInDirectory(Page *page, Heapfile *heapfile, PageID pid, void (*applyAction)(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid));
+void _read_page(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid); 
+void _write_page(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid);
