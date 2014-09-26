@@ -8,6 +8,9 @@ part2Test: part2Test.cc recordLib.o
 part3Test: part3Test.cc recordLib.o pageLib.o
 	$(CC) -o $@ $< pageLib.o recordLib.o
 
+part4Test: part4test.cc heapfileLib.o pageLib.o recordLib.o
+	$(CC) -o $@ $< heapfileLib.o pageLib.o recordLib.o
+
 write_fixed_len_pages: write_fixed_len_pages.cc recordLib.o pageLib.o
 	$(CC) -o $@ $< pageLib.o recordLib.o
 
@@ -20,8 +23,8 @@ csv2heapfile: csv2heapfile.cc heapfileLib.o pageLib.o recordLib.o
 recordLib.o: recordLib.cc recordLib.h
 	$(CC) -o recordLib.o -c recordLib.cc
 
-pageLib.o: pageLib.cc pageLib.h recordLib.o
-	$(CC) -o pageLib.o recordLib.o -c pageLib.cc
+pageLib.o: pageLib.cc pageLib.h
+	$(CC) -o pageLib.o -c pageLib.cc
 
 heapfileLib.o: heapfileLib.cc heapfileLib.h 
 	$(CC) -o heapfileLib.o -c heapfileLib.cc
