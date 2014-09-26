@@ -3,24 +3,34 @@
 #include "heapfileLib.h"
 
 int main(int argc, char **argv) {
-	if (argc < 3) {
-		printf("Usage: csv2heapfile <csv_file> <heapfile> <page_size>");
+
+	if (argc < 4) {
+		printf("Usage: csv2heapfile <csv_file> <heapfile> <page_size>\n");
 		return 0;
 	}
 
-	FILE *fp = fopen("part4Results", "w");
+	// initalize files
+	FILE* inFile = fopen(argv[1], "r");
+	FILE* outFile = fopen(argv[2], "w+");
+	int pageSize = atoi(argv[3]);
 
-	long start = now();
-    	while(written_sz < n) {
-        	bzero(buf, block_sz);
-        	sz = (n-written_sz > block_sz) ? block_sz : (n - written_sz);
-        	random_array(buf, sz);
-        	fwrite(buf, 1, sz, fp);
-     	fflush(fp);
-		written_sz += sz;
-    	}
-    	long end = now();
+	Heapfile *heapfile = (Heapfile *) malloc(sizeof(Heapfile));
+	init_heapfile(heapfile, pageSize, outFile);
+    	
+	// Write file into heap
+	char line[2048];
+	while (fgets(line, 2048, inFile)) {   
+		Page *page = (Page *) malloc(pageSize);
+		init_fixed_len_page(page, pageSize, 10000);
+	
+		// TODO Populate page with records here
 
-    	fclose(fp);
-	return 0;
+		PageID pageId = alloc_page(heapfile);
+		write_page(page, heapfile, pageId);
+	}
+	
+	fclose(inFile);
+	fclose(outFile);
+
 }
+

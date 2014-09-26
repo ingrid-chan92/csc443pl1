@@ -40,8 +40,9 @@ void init_heapfile(Heapfile *heapfile, int page_size, FILE *file) {
 PageID alloc_page(Heapfile *heapfile) {
 
 	// Initialization
-	int dirPageOffset = 0; // start at first directory page
+	int dirPageOffset = 0; // first directory at top of file
 	PageID newPage = 0;	
+	bool found = false;
 
 	FILE *file = heapfile->file_ptr;
 	int pageSize = heapfile->page_size;
@@ -63,14 +64,15 @@ PageID alloc_page(Heapfile *heapfile) {
 			newPage++;
 
 			if (dirEntry->page_offset == 0) {
+		
 				// found next empty slot	
 				dirEntry->page_offset = newPage * pageSize;
 				dirEntry->freespace = pageSize;
-		
+
 				// write into directory	
 				fseek(file, -pageSize + i, SEEK_CUR);		
-				fwrite(&dirEntry, dirEntrySize, 1, file);
-				break;
+				fwrite(dirEntry, dirEntrySize, 1, file);
+				goto cleanup;
 			}
 		
 		}
@@ -80,13 +82,14 @@ PageID alloc_page(Heapfile *heapfile) {
 		// Check for next directory page
 		memcpy(dirEntry, dir, dirEntrySize);
 		if (dirEntry->page_offset == 0) {
-			// no next directory page exists, create new one
+			// no next directory page exists, create new one at index newPage++
+			newPage++;
 
 			// Add new dir page to linked list
-			dirEntry->page_offset = newPage * pageSize;
+			dirEntry->page_offset = newPage  * pageSize;
 			dirEntry->freespace = 0;
 			fseek(file, -pageSize, SEEK_CUR);
-			fwrite(&dirEntry, dirEntrySize, 1, file);		
+			fwrite(dirEntry, dirEntrySize, 1, file);		
 
 			// write directory page into memory
 			fseek(file, newPage * pageSize, SEEK_SET);
@@ -94,6 +97,7 @@ PageID alloc_page(Heapfile *heapfile) {
 		
 			// Go to new page at next iteration
 			dirPageOffset = dirEntry->page_offset;
+			// DEBUG: printf("Allocated dir at %d\n", dirEntry->page_offset);
 
 		} else {
 			// next directory page exists. Search that one
@@ -102,10 +106,10 @@ PageID alloc_page(Heapfile *heapfile) {
 		}
 	}
 
-	// clean up
-	free(dir);
-	free(dirEntry);
-	return newPage;
+	cleanup:
+		free(dir);
+		free(dirEntry);
+		return newPage;
 }
 
 /**
@@ -117,8 +121,10 @@ void read_page(Heapfile *heapfile, PageID pid, Page *page) {
 }
 
 void _read_page(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid) {
-	fseek(heapfile->file_ptr, dirEntry->page_offset, SEEK_SET);
-	fread(page->data, heapfile->page_size, 1, heapfile->file_ptr);
+	FILE *file = heapfile->file_ptr;
+
+	fseek(file, dirEntry->page_offset, SEEK_SET);
+	fread(page->data, page->page_size, 1, file);
 }
 
 /**
@@ -136,7 +142,7 @@ void _write_page(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid) {
 	// update freespace counter
 	dirEntry->freespace = fixed_len_page_freeslots(page);	
 	fseek(file, -pageSize + (pid * sizeof(DirEntry)), SEEK_CUR);		
-	fwrite(&dirEntry, sizeof(DirEntry), 1, file);
+	fwrite(dirEntry, sizeof(DirEntry), 1, file);
 
 	// find location to write
 	fseek(file, dirEntry->page_offset, SEEK_SET);
@@ -163,42 +169,44 @@ void findEntryInDirectory(Page *page, Heapfile *heapfile, PageID pid, void (*app
 	FILE *file = heapfile->file_ptr;
 	int pageSize = heapfile->page_size;
 	int dirEntrySize = sizeof(DirEntry);	
+	int dirSize = pageSize / dirEntrySize;		// number of pages tracked by directory
 
 	char *dir = (char *) malloc(pageSize);	
 	DirEntry *dirEntry = (DirEntry *) malloc(dirEntrySize);
 
+	// Find directory containing pid
+	int relativePid = pid;
 	int dirPageOffset = 0; // start at first directory
-
 	while (true) {
 		// Read in directory page given by dirPageID		
 		fseek(file, dirPageOffset, SEEK_SET);	
 		fread(dir, pageSize, 1, file);
 
-		// Search for free slot in directory		
-		for (int i = dirEntrySize; i < pageSize; i+= dirEntrySize) {
-
-			// Get next directory entry
-			memcpy(dirEntry, dir + i, dirEntrySize);
-			if (dirEntry->page_offset == (pid * pageSize)) {
-
-				/* found the page */
-				(*applyAction) (heapfile, page, dirEntry, pid);
-				break;
-			}		
-		}
-
-		/* At this point, no match was found. Check for next directory */
-
-		memcpy(dirEntry, dir, dirEntrySize);
-		if (dirEntry->page_offset != 0) {
-
+		if ((relativePid - dirSize) < 0) {
+			break;
+		} else {
 			// next directory page exists. search in that directory
-			dirPageOffset = dirEntry->page_offset;
+			memcpy(dirEntry, dir, dirEntrySize);
+			if (dirEntry->page_offset != 0) {				
+				dirPageOffset = dirEntry->page_offset;
+				relativePid = relativePid - dirSize;
+			} else {
+				// no next dir exists. Pid does not belong in heapfile
+				goto cleanup;
+			}
 		}
 	}
-	
-	// cleanup
-	free(dir);
-	free(dirEntry);	
+
+	/* At this point, we have the directory containing pid and the pid relative to the directory*/
+
+	// Get dirEntry and apply callback function
+	memcpy(dirEntry, dir + (dirEntrySize * relativePid), dirEntrySize);	
+	(*applyAction) (heapfile, page, dirEntry, relativePid);
+
+	// DEBUG: printf("Accessed pid %d to offset %d\n", pid, dirEntry->page_offset);
+
+	cleanup:
+		free(dir);
+		free(dirEntry);	
 }
 
