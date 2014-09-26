@@ -1,10 +1,11 @@
 #include "pageLib.h"
 
+int BYTE_OFFSET = 1;
+
 /**
 * Initializes a page using the given slot size
 */
 void init_fixed_len_page(Page *page, int page_size, int slot_size) {
-
 	page->data = (void *)malloc(page_size);
 	page->page_size = page_size;
 	page->slot_size = slot_size;
@@ -24,32 +25,47 @@ int fixed_len_page_capacity(Page *page) {
 int fixed_len_page_freeslots(Page *page) {
 
 	int page_count = 0;
-	char target;
-	size_t remainder;
-	size_t max;
+	char* target_ptr;
+	int remainder;
+	int max;
 
 	//printf("slot size: %d \n\n", fixed_len_page_capacity(page)/sizeof(char *));
-	
+	//printf("inside freeslots\n");
 	max = fixed_len_page_capacity(page)/sizeof(char *);
 	remainder = fixed_len_page_capacity(page)%sizeof(char *);
+	//printf("max: %d \n", max);
+	//printf("remainder: %d \n", remainder);
 
 	//iterate through every byte in the slot
-	for (size_t slot_count=0; slot_count < max; slot_count++) {
+	//printf("byte loop\n");
+	for (int slot_count=0; slot_count < max; slot_count++) {
 		//iterate through every bit of the byte	    	
-		for(size_t i = 0; i < sizeof(char *); i++) 
+		for(int i = 0; i < sizeof(char *); i++) 
 		{
-			target = *((char *)page->data+page->page_size-slot_count);
-			if (!((target) & (1 << i)))
+			//printf("%d ", (int)i);
+			target_ptr = (char *)page->data+page->page_size-slot_count-BYTE_OFFSET;
+			if (!((*target_ptr) & (1 << i))){
+				//printf("true\n");					
 				page_count++;
+			} else {
+				//printf("\n");
+			}
 		}
 	}
 
 	//iterate through every valid bits of the remainder byte	    	
-	for(size_t over = 0; over < remainder; over++) 
+	//printf("remainder loop\n");	
+	for(int over = 0; over < remainder; over++) 
 	{
-		target = *((char *)page->data+page->page_size-max);
-		if (!((target) & (1 << over)))
+		//printf("%d ", over);
+		target_ptr = (char *)page->data+page->page_size-max-BYTE_OFFSET;
+		if (!((*target_ptr) & (1 << over))){
+			//printf("true\n");			
 			page_count++;
+		} else {
+			//printf("\n");
+		}
+		
 	}
 	
 	return page_count;
@@ -67,22 +83,23 @@ int add_fixed_len_page(Page *page, Record *r) {
 	int slot_num=-1;
 	int bit_offset=0;
 	char* target_ptr;
-	size_t remainder;
-	size_t max;
+	int remainder;
+	int max;
 
+	//printf("in add\n");
 	//printf("slot size: %d \n\n", fixed_len_page_capacity(page)/sizeof(char *));
 	
 	max = fixed_len_page_capacity(page)/sizeof(char *);
 	remainder = fixed_len_page_capacity(page)%sizeof(char *);
 
 	//iterate through all the full bytes
-	for (size_t slot_count=0; slot_count < max; slot_count++) {
+	for (int slot_count=0; slot_count < max; slot_count++) {
 		//iterate through every bit of the byte	    	
-		for(size_t i = 0; i < sizeof(char *); i++) 
+		for(int i = 0; i < sizeof(char *); i++) 
 		{
-			target_ptr = ((char *)page->data+page->page_size-slot_count);
+			target_ptr = ((char *)page->data+page->page_size-slot_count-BYTE_OFFSET);
 			if (!((*target_ptr) & (1 << i))) {
-				slot_num=slot_count*8+i;
+				slot_num=slot_count*sizeof(char)+i;
 				bit_offset = i;
 				break;
 			}
@@ -94,24 +111,25 @@ int add_fixed_len_page(Page *page, Record *r) {
 	}
 
 	//iterate through every valid bits of the remainder byte	    	
-	for(size_t over = 0; over < remainder; over++) 
+	for(int over = 0; over < remainder; over++) 
 	{
 		if(slot_num != -1) {
+			//printf("slot is not -1");
 			break;
 		}
-
-		target_ptr = ((char *)page->data+page->page_size-max);
-		if (!((*target_ptr) & (1 << over)))
-			slot_num=max*8+over;
+		target_ptr = ((char *)page->data+page->page_size-max-BYTE_OFFSET);
+		if (!((*target_ptr) & (1 << over))) {
+			slot_num=max*sizeof(char)+over;
 			bit_offset = over;
 			break;
+		}
 	}
 
 	if (slot_num != -1) {
 		*target_ptr = *target_ptr|(1<<bit_offset);
 		fixed_len_write(r, (void *)((char *)page->data + slot_num*page->slot_size));
 	}
-	
+	//printf("slot_num: %d \n", slot_num);
 	return slot_num;
 }
 
@@ -119,14 +137,13 @@ int add_fixed_len_page(Page *page, Record *r) {
 * Write a record into a given slot.
 */
 void write_fixed_len_page(Page *page, int slot, Record *r) {
-	int slot_byte = slot / 8;
-	int slot_pos = slot % 8;
-	char *slot_ptr = (char *)page->data+page->page_size-slot_byte;
+	int slot_byte = slot / sizeof(char *);
+	int slot_pos = slot % sizeof(char *);
+	char *slot_ptr = (char *)page->data+page->page_size-slot_byte-BYTE_OFFSET;
 	
 	if (slot <= fixed_len_page_capacity(page)) {
 		//write if slot is empty
 		if (!(*slot_ptr & (1<<slot_pos))) {
-
 			fixed_len_write(r, (void *)((char *)page->data + slot*page->slot_size));
 			*slot_ptr = *slot_ptr | (1<<slot_pos);
 		}
@@ -137,10 +154,9 @@ void write_fixed_len_page(Page *page, int slot, Record *r) {
 * Read a record from the page from a given slot.
 */
 void read_fixed_len_page(Page *page, int slot, Record *r) {
-	int slot_byte = slot / 8;
-	int slot_pos = slot % 8;
-	char *slot_ptr = (char *)page->data+page->page_size-slot_byte;
-	void *a = slot_ptr;
+	int slot_byte = slot / sizeof(char *);
+	int slot_pos = slot % sizeof(char *);
+	char *slot_ptr = (char *)page->data+page->page_size-slot_byte-BYTE_OFFSET;
 	
 	if (slot <= fixed_len_page_capacity(page)) {
 		//read slot if it has something there
@@ -149,4 +165,21 @@ void read_fixed_len_page(Page *page, int slot, Record *r) {
 			//memcpy(((*r)[0]), (char *)page->data + slot*page->slot_size, 1000);
 		}
 	}
+};
+
+/**
+* Check if a slot is occupied
+*/
+bool hasData(Page* page, int slot) {
+	int slot_byte = slot / sizeof(char *);
+	int slot_pos = slot % sizeof(char *);
+	char *slot_ptr = (char *)page->data+page->page_size-slot_byte-BYTE_OFFSET;
+	
+	if (slot <= fixed_len_page_capacity(page)) {
+		//read slot if it has something there
+		if ((*slot_ptr & (1<<slot_pos))) {
+			return true;
+		}
+	}
+	return false;
 };
