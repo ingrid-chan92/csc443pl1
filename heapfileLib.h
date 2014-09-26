@@ -31,3 +31,23 @@ void writeDirectoryPage(FILE *file, int page_size);
 void findEntryInDirectory(Page *page, Heapfile *heapfile, PageID pid, void (*applyAction)(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid));
 void _read_page(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid); 
 void _write_page(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid);
+
+class RecordIterator {
+	Heapfile *currHeapfile;
+	char *currDir;
+	DirEntry *currDirEntry;
+	Page *currPage;
+	Record *currRecord;
+	int currPageSlot;
+	int currPageMaxSlots;
+	int dirEntryPtr, recordPtr, maxDirEntries;
+
+public:
+	RecordIterator(Heapfile *heapfile);
+	Record next();
+	bool hasNext();
+
+private:
+	void cleanup();
+	void readPageFromDirectory();
+};

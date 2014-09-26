@@ -1,6 +1,6 @@
 CC = g++
 
-all: part2Test part3Test part4Test csv2heapfile
+all: part2Test part3Test part4Test csv2heapfile scan
 
 part2Test: part2Test.cc recordLib.o
 	$(CC) -o $@ $< recordLib.o
@@ -9,6 +9,9 @@ part3Test: part3Test.cc recordLib.o pageLib.o
 	$(CC) -o $@ $< pageLib.o recordLib.o
 
 part4Test: part4test.cc heapfileLib.o pageLib.o recordLib.o
+	$(CC) -o $@ $< heapfileLib.o pageLib.o recordLib.o
+
+scan: scan.cc heapfileLib.o pageLib.o recordLib.o
 	$(CC) -o $@ $< heapfileLib.o pageLib.o recordLib.o
 
 write_fixed_len_pages: write_fixed_len_pages.cc recordLib.o pageLib.o
