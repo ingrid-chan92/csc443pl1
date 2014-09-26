@@ -19,6 +19,8 @@ int main(int argc, char **argv) {
     	
 /* WRITE TEST */
 	// Write data into memory
+	int pageIds[3];
+	int i = 0;
 	char line1[2048];
 	while (fgets(line1, 2048, inFile)) {   		
 		
@@ -30,6 +32,9 @@ int main(int argc, char **argv) {
 
 		// Write page into memory
 		write_page(page, heapfile, pageId);
+		
+		pageIds[i++] = pageId;
+
 	}
 	
 	fclose(inFile);
@@ -47,12 +52,12 @@ int main(int argc, char **argv) {
 	heapfile->page_size = pageSize;
     	
 	char line2[2048];
-	int pageId = 1;
+	i = 0;
 	while (fgets(line2, 2048, inFile)) {   		
 		// Read page back from memory
 		Page *readPage = (Page *) malloc(pageSize);
 		init_fixed_len_page(readPage, pageSize, 2);
-		read_page(heapfile, pageId++, readPage);
+		read_page(heapfile, pageIds[i++], readPage);		
 	}
 	
 	fclose(inFile);

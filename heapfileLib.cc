@@ -82,13 +82,14 @@ PageID alloc_page(Heapfile *heapfile) {
 		// Check for next directory page
 		memcpy(dirEntry, dir, dirEntrySize);
 		if (dirEntry->page_offset == 0) {
-			// no next directory page exists, create new one
+			// no next directory page exists, create new one at index newPage++
+			newPage++;
 
 			// Add new dir page to linked list
-			dirEntry->page_offset = newPage * pageSize;
+			dirEntry->page_offset = newPage  * pageSize;
 			dirEntry->freespace = 0;
 			fseek(file, -pageSize, SEEK_CUR);
-			fwrite(&dirEntry, dirEntrySize, 1, file);		
+			fwrite(dirEntry, dirEntrySize, 1, file);		
 
 			// write directory page into memory
 			fseek(file, newPage * pageSize, SEEK_SET);
@@ -96,6 +97,7 @@ PageID alloc_page(Heapfile *heapfile) {
 		
 			// Go to new page at next iteration
 			dirPageOffset = dirEntry->page_offset;
+// printf("Allocated dir at %d\n", dirEntry->page_offset);
 
 		} else {
 			// next directory page exists. Search that one
@@ -123,6 +125,7 @@ void _read_page(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid) {
 
 	fseek(file, dirEntry->page_offset, SEEK_SET);
 	fread(page->data, page->page_size, 1, file);
+// printf("Read %d from offset %d\n", pid, dirEntry->page_offset);
 }
 
 /**
@@ -147,6 +150,7 @@ void _write_page(Heapfile *heapfile, Page *page, DirEntry *dirEntry, int pid) {
 
 	// write data to slot
 	fwrite(page->data, pageSize, 1, file);
+// printf("Wrote %d to offset %d\n", pid, dirEntry->page_offset);
 }
 
 /**
