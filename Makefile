@@ -1,6 +1,6 @@
 CC = g++
 
-all: part2Test part3Test part4Test csv2heapfile
+all: part2Test part3Test part4Test insert csv2heapfile
 
 part2Test: part2Test.cc recordLib.o
 	$(CC) -o $@ $< recordLib.o
@@ -20,6 +20,9 @@ read_fixed_len_page: read_fixed_len_page.cc recordLib.o pageLib.o
 csv2heapfile: csv2heapfile.cc heapfileLib.o pageLib.o recordLib.o
 	$(CC) -o $@ $< heapfileLib.o pageLib.o recordLib.o
 
+insert: insert.cc heapfileLib.o pageLib.o recordLib.o
+	$(CC) -o $@ $< heapfileLib.o pageLib.o recordLib.o
+
 recordLib.o: recordLib.cc recordLib.h
 	$(CC) -o recordLib.o -c recordLib.cc
 
@@ -30,4 +33,4 @@ heapfileLib.o: heapfileLib.cc heapfileLib.h
 	$(CC) -o heapfileLib.o -c heapfileLib.cc
 
 clean:
-	rm -f part*Test csv2heapfile *.o
+	rm -f part*Test csv2heapfile insert *.o
