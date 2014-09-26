@@ -5,17 +5,19 @@
 int main(int argc, char **argv) {
 
 	if (argc < 4) {
-		printf("Usage: csv2heapfile <csv_file> <heapfile> <page_size>\n");
+		printf("Usage: insert <heapfile> <csv_file> <page_size>\n");
 		return 0;
 	}
 
 	// initalize files
-	FILE* inFile = fopen(argv[1], "r");
-	FILE* outFile = fopen(argv[2], "w+");
+	FILE* outFile = fopen(argv[1], "r+");
+	FILE* inFile = fopen(argv[2], "r");	
 	int pageSize = atoi(argv[3]);
 
+	// Create heapfile
 	Heapfile *heapfile = (Heapfile *) malloc(sizeof(Heapfile));
-	init_heapfile(heapfile, pageSize, outFile);
+	heapfile->file_ptr = outFile;
+	heapfile->page_size = pageSize;
     	
 	// Write file into heap
 	char line[2048];
@@ -26,21 +28,22 @@ int main(int argc, char **argv) {
 		
 		// Convert line into record
 		Record record;
-		char *token = strtok(line, ","); 
+		char *token = strtok(line, ",");
+   
 	   	// walk through each attr and push to record
 	   	while(token != NULL) {
 		 	record.push_back(token);	    
 		 	token = strtok(NULL, ",");
 	   	}
-  		
+		
 		// Write record into page
-		if (fixed_len_page_freeslots(page) == 0) {  
+		if (fixed_len_page_freeslots(page) == 0) {
 			// Current page is full. Write page to heap and start new page
 			PageID pageId = alloc_page(heapfile);
 			write_page(page, heapfile, pageId);
 
 			init_fixed_len_page(page, pageSize, SLOT_SIZE);	
-  
+
 		} else {
 			// freeslots available. Write record to page
 			add_fixed_len_page(page, &record);	
