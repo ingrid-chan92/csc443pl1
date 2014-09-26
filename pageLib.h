@@ -10,6 +10,8 @@ typedef struct {
     int slot_size;
 } Page;
 
+static const int SLOT_SIZE = 1000;
+
 void init_fixed_len_page(Page *page, int page_size, int slot_size);
 int fixed_len_page_capacity(Page *page);
 int fixed_len_page_freeslots(Page *page);

@@ -16,7 +16,7 @@ typedef struct {
 } RecordID;
 
 typedef struct {
-	PageID page_offset;
+	int page_offset;
 	int freespace;
 
 } DirEntry;

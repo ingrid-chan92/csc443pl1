@@ -3,16 +3,109 @@
 #include "heapfileLib.h"
 
 class RecordIterator {
-    public:
+	Heapfile *currHeapfile;
+	char *currDir;
+	DirEntry *currDirEntry;
+	Page *currPage;
+	Record *currRecord;
+
+	int dirEntryPtr, recordPtr, maxDirEntries;
+		
+    	public:
 		RecordIterator(Heapfile *heapfile) {
+			// initialize offsets to starting page
+			dirEntryPtr = sizeof(DirEntry);
+			recordPtr = 0;
+			maxDirEntries = heapfile->page_size / sizeof(DirEntry);
+	
+			// Allocate pointers
+			currDir = (char *) malloc(heapfile->page_size);	
+			currDirEntry = (DirEntry *) malloc(sizeof(DirEntry));
+			currPage = (Page *) malloc (heapfile->page_size);
+			init_fixed_len_page(currPage, heapfile->page_size, SLOT_SIZE);
+			// allocate record here
+
+			// Read in first dir						
+			fseek(heapfile->file_ptr, 0, SEEK_SET);	
+			fread(currDir, heapfile->page_size, 1, heapfile->file_ptr);
+			
+			readPageFromDirectory();
 
 		}
 		
 		Record next() {
+			if (currRecord == NULL) {
+				// Nothing left to process. Throw exception if called
+				throw;
+			}			
 
+			Record *prevRecord = currRecord;
+			
+			// TODO: If recordPtr is not at last record, get next record + increment recordPtr + goto endResult
+			
+			// Else, read a new page
+			recordPtr = 0;
+			dirEntryPtr += sizeof(DirEntry);
+			if (dirEntryPtr < currHeapfile->page_size) {
+				// next directory entry exists. Retrieve and process
+				readPageFromDirectory();
+
+			} else {
+				// no directory entries left. Go to next directory page
+
+				// Check for next directory page
+				memcpy(currDirEntry, currDir, sizeof(DirEntry));
+				if (currDirEntry->page_offset == 0) {
+					// No more directory pages. No more pages to process
+					cleanup();				
+					
+				} else {
+					// next directory page exists. Search that one	
+					fseek(currHeapfile->file_ptr, currDirEntry->page_offset, SEEK_SET);	
+					fread(currDir, currHeapfile->page_size, 1, currHeapfile->file_ptr);
+					
+					dirEntryPtr = sizeof(DirEntry);
+					readPageFromDirectory();
+				}
+			}
+					
+			endResult:			
+				return *prevRecord;
 		}
 		
 		bool hasNext() {
+			return currRecord != NULL;
+		}
+
+	private:
+		/**
+		 *	Deallocate all memory and set currRecord to NULL;
+		 */
+		void cleanup() {
+			free(currDir);
+			free(currDirEntry);
+			free(currPage);
+			free(currRecord);
+
+			currRecord = NULL;
+		}
+
+		/**
+		 *	Read the page from the Directory pointed to be dirEntryPtr
+		 */
+		void readPageFromDirectory() {
+			// next directory entry exists. Retrieve and process		
+			memcpy(currDirEntry, currDir + dirEntryPtr, sizeof(DirEntry));
+			if (currDirEntry->page_offset == 0) {
+				// no pages in heapfile
+				cleanup();
+				return;
+			}
+
+			// read in page from directory
+			_read_page(currHeapfile, currPage, currDirEntry, 0);
+
+			// TODO Get first record from page and set as currRecord
 
 		}
 };

@@ -19,18 +19,45 @@ int main(int argc, char **argv) {
     	
 	// Write file into heap
 	char line[2048];
-	while (fgets(line, 2048, inFile)) {   
-		Page *page = (Page *) malloc(pageSize);
-		init_fixed_len_page(page, pageSize, 10000);
-	
-		// TODO Populate page with records here
+	Page *page = (Page *) malloc(pageSize);
+	init_fixed_len_page(page, pageSize, 10000);	
 
+	while (fgets(line, 2048, inFile)) {   
+		
+		// Convert line into record
+		Record record;
+		char *token = strtok(line, ",");
+   
+	   	// walk through each attr and push to record
+	   	while(token != NULL) {
+		 	record.push_back(token);	    
+		 	token = strtok(NULL, ",");
+	   	}
+		
+		// Write record into page
+		if (fixed_len_page_freeslots(page) == 0) {
+			// Current page is full. Write page to heap and start new page
+			PageID pageId = alloc_page(heapfile);
+			write_page(page, heapfile, pageId);
+
+			init_fixed_len_page(page, pageSize, 10000);	
+
+		} else {
+			// freeslots available. Write record to page
+			add_fixed_len_page(page, &record);	
+		}	
+	}
+	
+	// Write any remaining data into heap
+	if (fixed_len_page_freeslots(page) > 0) {
 		PageID pageId = alloc_page(heapfile);
 		write_page(page, heapfile, pageId);
 	}
-	
-	fclose(inFile);
-	fclose(outFile);
 
+	fclose(inFile);
+	fclose(outFile);	
+
+	free(heapfile);
+	free(page);
 }
 
