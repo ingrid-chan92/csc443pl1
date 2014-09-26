@@ -7,6 +7,8 @@ class RecordIterator {
 	char *currDir;
 	DirEntry *currDirEntry;
 	Page *currPage;
+	int currPageSlot;
+	int currPageMaxSlots;
 	Record *currRecord;
 
 	int dirEntryPtr, recordPtr, maxDirEntries;
@@ -15,8 +17,10 @@ class RecordIterator {
 		RecordIterator(Heapfile *heapfile) {
 			// initialize offsets to starting page
 			dirEntryPtr = sizeof(DirEntry);
-			recordPtr = 0;
 			maxDirEntries = heapfile->page_size / sizeof(DirEntry);
+			
+			currPageSlot = 0;
+			currPageMaxSlots = 0;
 	
 			// Allocate pointers
 			currDir = (char *) malloc(heapfile->page_size);	
@@ -34,6 +38,8 @@ class RecordIterator {
 		}
 		
 		Record next() {
+			bool isRecordLast = true;
+			int nextSlot=0;
 			if (currRecord == NULL) {
 				// Nothing left to process. Throw exception if called
 				throw;
@@ -41,36 +47,45 @@ class RecordIterator {
 
 			Record *prevRecord = currRecord;
 			
-			// TODO: If recordPtr is not at last record, get next record + increment recordPtr + goto endResult
-			
-			// Else, read a new page
-			recordPtr = 0;
-			dirEntryPtr += sizeof(DirEntry);
-			if (dirEntryPtr < currHeapfile->page_size) {
-				// next directory entry exists. Retrieve and process
-				readPageFromDirectory();
-
-			} else {
-				// no directory entries left. Go to next directory page
-
-				// Check for next directory page
-				memcpy(currDirEntry, currDir, sizeof(DirEntry));
-				if (currDirEntry->page_offset == 0) {
-					// No more directory pages. No more pages to process
-					cleanup();				
-					
-				} else {
-					// next directory page exists. Search that one	
-					fseek(currHeapfile->file_ptr, currDirEntry->page_offset, SEEK_SET);	
-					fread(currDir, currHeapfile->page_size, 1, currHeapfile->file_ptr);
-					
-					dirEntryPtr = sizeof(DirEntry);
-					readPageFromDirectory();
+			//If recordPtr is not at last record or if it is not empty, get next record + increment recordPtr + goto endResult
+			for (int i = currPageSlot + 1; i < currPageMaxRecords; i++) {
+				if (hasData(currPage, i){
+					nextSlot=i;
+					isRecordLast = false;
 				}
 			}
+			
+			if (!isRecordLast) {
+				read_fixed_len_page(currPage, i, &currRecord);
+				currPageSlot=i;
+			} else {
+				// Else, read a new page
+				dirEntryPtr += sizeof(DirEntry);
+				if (dirEntryPtr < currHeapfile->page_size) {
+					// next directory entry exists. Retrieve and process
+					readPageFromDirectory();
+
+				} else {
+					// no directory entries left. Go to next directory page
+
+					// Check for next directory page
+					memcpy(currDirEntry, currDir, sizeof(DirEntry));
+					if (currDirEntry->page_offset == 0) {
+						// No more directory pages. No more pages to process
+						cleanup();				
 					
+					} else {
+						// next directory page exists. Search that one	
+						fseek(currHeapfile->file_ptr, currDirEntry->page_offset, SEEK_SET);	
+						fread(currDir, currHeapfile->page_size, 1, currHeapfile->file_ptr);
+					
+						dirEntryPtr = sizeof(DirEntry);
+						readPageFromDirectory();
+					}
+				}
+			}
 			endResult:			
-				return *prevRecord;
+			return *prevRecord;
 		}
 		
 		bool hasNext() {
@@ -106,7 +121,14 @@ class RecordIterator {
 			_read_page(currHeapfile, currPage, currDirEntry, 0);
 
 			// TODO Get first record from page and set as currRecord
-
+			currPageMaxSlots = fixed_len_page_capacity(currPage)
+			for (int i = 0; i < currPageMaxSlots; i++){
+				if (hasData(currPage, i)){
+					read_fixed_len_page(currPage, i, &currRecord);
+					currPageSlot=i;
+					break;
+				}
+			}
 		}
 };
 
