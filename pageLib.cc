@@ -110,6 +110,8 @@ int add_fixed_len_page(Page *page, Record *r) {
 		}
 	}
 
+	//for(int i = 0; i < r.si
+
 	//iterate through every valid bits of the remainder byte	    	
 	for(int over = 0; over < remainder; over++) 
 	{

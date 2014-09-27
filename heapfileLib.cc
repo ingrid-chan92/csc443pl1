@@ -16,12 +16,14 @@ RecordIterator::RecordIterator(Heapfile *heapfile) {
 	currDirEntry = (DirEntry *) malloc(sizeof(DirEntry));
 	currPage = (Page *) malloc (heapfile->page_size);
 	init_fixed_len_page(currPage, heapfile->page_size, SLOT_SIZE);
-	// allocate record here
+	currRecord = (Record *) malloc(SLOT_SIZE);
 
-	// Read in first dir						
-	fseek(heapfile->file_ptr, 0, SEEK_SET);	
-	fread(currDir, heapfile->page_size, 1, heapfile->file_ptr);
-	
+	currHeapfile = heapfile;
+
+	// Read in first dir					
+	fseek(currHeapfile->file_ptr, 0, SEEK_SET);	
+	fread(currDir, currHeapfile->page_size, 1, currHeapfile->file_ptr);
+
 	readPageFromDirectory();
 
 }
@@ -35,18 +37,19 @@ Record RecordIterator::next() {
 		throw;
 	}			
 
-	Record *prevRecord = currRecord;
-	
-	// TODO: If recordPtr is not at last record, get next record + increment recordPtr + goto endResult
+	Record prevRecord = *currRecord;
+
 	//If recordPtr is not at last record or if it is not empty, get next record + increment recordPtr + goto endResult
-	for (int j = currPageSlot + 1; j < currPageMaxSlots; j++) {
+	for (int j = currPageSlot + 1; j <currPageMaxSlots; j++) {
 		if (hasData(currPage, j)){
 			nextSlot=j;
 			isRecordLast = false;
+			break;
 		}
 	}
 	// Else, read a new page
 	if (!isRecordLast) {
+		currRecord->clear();
 		read_fixed_len_page(currPage, nextSlot, currRecord);
 		currPageSlot=nextSlot;
 	} else {
@@ -55,10 +58,8 @@ Record RecordIterator::next() {
 		if (dirEntryPtr < currHeapfile->page_size) {
 			// next directory entry exists. Retrieve and process
 			readPageFromDirectory();
-
 		} else {
 			// no directory entries left. Go to next directory page
-
 			// Check for next directory page
 			memcpy(currDirEntry, currDir, sizeof(DirEntry));
 			if (currDirEntry->page_offset == 0) {
@@ -75,8 +76,8 @@ Record RecordIterator::next() {
 			}
 		}
 	}
-	endResult:			
-	return *prevRecord;
+			
+	return prevRecord;
 }
 
 bool RecordIterator::hasNext() {
@@ -110,10 +111,11 @@ void RecordIterator::readPageFromDirectory() {
 	// read in page from directory
 	_read_page(currHeapfile, currPage, currDirEntry, 0);
 
-	// TODO Get first record from page and set as currRecord
+	// Get first record from page and set as currRecord
 	currPageMaxSlots = fixed_len_page_capacity(currPage);
 	for (int i = 0; i < currPageMaxSlots; i++){
 		if (hasData(currPage, i)){
+			currRecord->clear();
 			read_fixed_len_page(currPage, i, currRecord);
 			currPageSlot=i;
 			break;
@@ -169,7 +171,7 @@ PageID alloc_page(Heapfile *heapfile) {
 			newPage++;
 
 			if (dirEntry->page_offset == 0) {
-		
+
 				// found next empty slot	
 				dirEntry->page_offset = newPage * pageSize;
 				dirEntry->freespace = pageSize;

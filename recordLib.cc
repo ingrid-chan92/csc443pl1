@@ -39,7 +39,7 @@ void fixed_len_read(void *buf, int size, Record *record) {
 	int bytesRead = 0;	
 
 	// Record all complete attributes into record
-	while ((bytesRead + ATTR_SIZE) < size) {
+	while ((bytesRead + ATTR_SIZE) <= size) {
 		char *attr = (char *) malloc(ATTR_SIZE);
 		memcpy(attr, ptr, ATTR_SIZE);
 		(*record).push_back(attr);

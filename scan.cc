@@ -3,9 +3,14 @@
 
 int main(int argc, char *argv[])
 {	
+	if (argc < 3) {
+		printf("Usage: scan <heapfile> <page_size>\n");
+		return 0;
+	}
+
 	Heapfile *heapFile;
 	Record heapRecord;
-	FILE* dataFile = fopen(argv[1], "r");
+	FILE* dataFile = fopen(argv[1], "r+");
 	int pageSize = atoi(argv[2]);
 
 	heapFile = (Heapfile *) malloc(sizeof(Heapfile));
@@ -21,9 +26,11 @@ int main(int argc, char *argv[])
 
 			if (i < heapRecord.size() - 1) {
 				printf(",");
-			} else {
-				printf("\n");
 			}
 		}
+		printf("\n\n");
+		heapRecord.clear();
 	}
+
+	return 0;
 }

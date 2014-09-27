@@ -52,5 +52,7 @@ int main(int argc, char **argv) {
 	free(heapfile);
 	free(page);
 
+	return 0;
+
 }
 
