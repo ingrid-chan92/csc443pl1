@@ -190,10 +190,10 @@ void remove_entry(Page* page, int slot) {
 	int slot_byte = slot / sizeof(char *);
 	int slot_pos = slot % sizeof(char *);
 	char *slot_ptr = (char *)page->data+page->page_size-slot_byte-BYTE_OFFSET;
-	int mask = 0;
+	char mask=0;
 
 	if (slot <= fixed_len_page_capacity(page)) {
-		mask = (11111111<<slot_pos+1 | 11111111>>8-slot_pos);
-		*slot_ptr = (*slot_ptr) | (mask);
+		mask = (255<<slot_pos+1 | 255>>8-slot_pos);
+		*slot_ptr = *slot_ptr & mask;
 	}
 };
