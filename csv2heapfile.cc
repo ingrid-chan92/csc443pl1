@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 	init_fixed_len_page(page, pageSize, SLOT_SIZE);	
 
 	while (fgets(line, 2048, inFile)) {   
-		
+
 		// Convert line into record
 		Record record;
 		char *token = strtok(line, ","); 
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 		 	record.push_back(token);	    
 		 	token = strtok(NULL, ",");
 	   	}
-  		
+
 		// Write record into page
 		if (fixed_len_page_freeslots(page) == 0) {  
 			// Current page is full. Write page to heap and start new page
@@ -41,14 +41,12 @@ int main(int argc, char **argv) {
 
 			init_fixed_len_page(page, pageSize, SLOT_SIZE);	
   
-		} else {
-			// freeslots available. Write record to page
-			add_fixed_len_page(page, &record);	
-		}	
+		}
+		add_fixed_len_page(page, &record);				
 	}
 	
 	// Write any remaining data into heap
-	if (fixed_len_page_freeslots(page) > 0) {
+	if (fixed_len_page_freeslots(page) != fixed_len_page_capacity(page)) {
 		PageID pageId = alloc_page(heapfile);
 		write_page(page, heapfile, pageId);
 	}
@@ -58,5 +56,7 @@ int main(int argc, char **argv) {
 
 	free(heapfile);
 	free(page);
+
+	return 0;
 }
 

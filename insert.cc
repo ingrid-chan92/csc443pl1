@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 	}
 	
 	// Write any remaining data into heap
-	if (fixed_len_page_freeslots(page) > 0) {
+	if (fixed_len_page_freeslots(page) != fixed_len_page_capacity(page)) {
 		PageID pageId = alloc_page(heapfile);
 		write_page(page, heapfile, pageId);
 	}

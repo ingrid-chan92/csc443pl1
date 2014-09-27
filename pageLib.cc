@@ -110,6 +110,8 @@ int add_fixed_len_page(Page *page, Record *r) {
 		}
 	}
 
+	//for(int i = 0; i < r.si
+
 	//iterate through every valid bits of the remainder byte	    	
 	for(int over = 0; over < remainder; over++) 
 	{
@@ -140,13 +142,11 @@ void write_fixed_len_page(Page *page, int slot, Record *r) {
 	int slot_byte = slot / sizeof(char *);
 	int slot_pos = slot % sizeof(char *);
 	char *slot_ptr = (char *)page->data+page->page_size-slot_byte-BYTE_OFFSET;
-	
+
 	if (slot <= fixed_len_page_capacity(page)) {
-		//write if slot is empty
-		if (!(*slot_ptr & (1<<slot_pos))) {
-			fixed_len_write(r, (void *)((char *)page->data + slot*page->slot_size));
-			*slot_ptr = *slot_ptr | (1<<slot_pos);
-		}
+		fixed_len_write(r, (void *)((char *)page->data + slot*page->slot_size));
+		*slot_ptr = *slot_ptr | (1<<slot_pos);
+
 	}	
 };
 
@@ -162,7 +162,6 @@ void read_fixed_len_page(Page *page, int slot, Record *r) {
 		//read slot if it has something there
 		if ((*slot_ptr & (1<<slot_pos))) {
 			fixed_len_read((void *)((char *)page->data + slot*page->slot_size), page->slot_size, r);
-			//memcpy(((*r)[0]), (char *)page->data + slot*page->slot_size, 1000);
 		}
 	}
 };

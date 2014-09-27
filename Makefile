@@ -26,6 +26,9 @@ csv2heapfile: csv2heapfile.cc heapfileLib.o pageLib.o recordLib.o
 insert: insert.cc heapfileLib.o pageLib.o recordLib.o
 	$(CC) -o $@ $< heapfileLib.o pageLib.o recordLib.o
 
+update: update.cc heapfileLib.o pageLib.o recordLib.o
+	$(CC) -o $@ $< heapfileLib.o pageLib.o recordLib.o
+
 recordLib.o: recordLib.cc recordLib.h
 	$(CC) -o recordLib.o -c recordLib.cc
 
