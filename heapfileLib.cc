@@ -145,6 +145,21 @@ void init_heapfile(Heapfile *heapfile, int page_size, FILE *file) {
  * Allocate another page in the heapfile.  This grows the file by a page.
  */
 PageID alloc_page(Heapfile *heapfile) {
+	return _alloc_or_get_page(heapfile, true);
+}
+
+/**
+ * Retrieve the first page with freespace for insertion
+ * If no pages have free space, allocate new page
+ */
+PageID getPageForInsertion(Heapfile *heapfile) {
+	return _alloc_or_get_page(heapfile, false);
+} 
+
+/**
+ * Allocate another page in the heapfile.  This grows the file by a page.
+ */
+PageID _alloc_or_get_page(Heapfile *heapfile, bool allocateNew) {
 
 	// Initialization
 	int dirPageOffset = 0; // first directory at top of file
@@ -169,6 +184,11 @@ PageID alloc_page(Heapfile *heapfile) {
 			// Get next directory entry
 			memcpy(dirEntry, dir + i, dirEntrySize);
 			newPage++;
+
+			if (!allocateNew && (dirEntry->freespace != 0)) {
+				// Found page with freespace
+				goto cleanup;
+			}
 
 			if (dirEntry->page_offset == 0) {
 
