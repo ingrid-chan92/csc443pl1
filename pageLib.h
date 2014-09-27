@@ -19,3 +19,4 @@ int add_fixed_len_page(Page *page, Record *r);
 void write_fixed_len_page(Page *page, int slot, Record *r);
 void read_fixed_len_page(Page *page, int slot, Record *r);
 bool hasData(Page *page, int slot);
+void remove_entry(Page *page, int slot);
