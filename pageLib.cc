@@ -193,7 +193,7 @@ void remove_entry(Page* page, int slot) {
 	int mask = 0;
 
 	if (slot <= fixed_len_page_capacity(page)) {
-		mask = (11111111<<slot_pos+1 | 11111111>>8-slot_pos); | 
-		*slot_ptr = (*slot_ptr | mask);
+		mask = (11111111<<slot_pos+1 | 11111111>>8-slot_pos);
+		*slot_ptr = (*slot_ptr) | (mask);
 	}
 };
