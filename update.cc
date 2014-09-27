@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
 	std::string recordStr (argv[2]);
 	RecordID recordId;
 	convertStringToRecordID(&recordId, recordStr);
-	printf("page_id: %d, slot: %d\n", recordId.page_id, recordId.slot);
 
 	// Retrieve page from heapfile
 	Page *page = (Page *) malloc(pageSize);
@@ -38,14 +37,14 @@ int main(int argc, char **argv) {
 	read_page(heapfile, recordId.page_id, page);
 
 	// Retrieve record from page
-	Record *record = (Record *) malloc (SLOT_SIZE);
-	read_fixed_len_page(page, recordId.slot, record);
+	Record record;
+	read_fixed_len_page(page, recordId.slot, &record);
 
 	// Modify attribute of record
-	(*record).at(attributeId) = newValue;
+	record.at(attributeId) = newValue;
 
 	// Write record back to heapfile
-	write_fixed_len_page(page, recordId.slot, record);
+	write_fixed_len_page(page, recordId.slot, &record);
 	write_page(page, heapfile, recordId.page_id);
 
 	fclose(outFile);	

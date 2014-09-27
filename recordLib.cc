@@ -48,13 +48,5 @@ void fixed_len_read(void *buf, int size, Record *record) {
 		ptr += ATTR_SIZE;
 		bytesRead += ATTR_SIZE;		
 	}
-	/*
-	// Write leftover data into record
-	if (bytesRead < size) {
-		char *attr = (char *) malloc(ATTR_SIZE);
-		memcpy(attr, ptr, size - bytesRead);
-		(*record).push_back(attr);
-	}
-	*/
 }
 
