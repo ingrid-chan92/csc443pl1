@@ -1,6 +1,7 @@
+#include <math.h>
 #include "pageLib.h"
 
-int BYTE_OFFSET = 1;
+int BYTE_OFFSET = 1 + sizeof(int);
 
 /**
 * Initializes a page using the given slot size
@@ -10,13 +11,18 @@ void init_fixed_len_page(Page *page, int page_size, int slot_size) {
 	page->page_size = page_size;
 	page->slot_size = slot_size;
 
+	int slot_bytes = sizeof(int) + ceil(page_size/slot_size/8);
+	int slot_available = (page_size)/(slot_size) - ceil(page_size/slot_size/slot_bytes);
+	int *slot_loc = (int *)page->data + page_size - BYTE_OFFSET;
+	*slot_loc = slot_available;
 }
 
 /**
 * Calculates the maximal number of records that fit in a page
 */
-int fixed_len_page_capacity(Page *page) {
-	return (page->page_size)/(page->slot_size) - 1;
+int fixed_len_page_capacity(Page *page) {;
+	int *slot_loc = (int *)page->data + page->page_size - BYTE_OFFSET;
+	return *slot_loc;
 }
 
 /**
