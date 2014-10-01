@@ -1,6 +1,6 @@
 CC = g++
 
-all: csv2heapfile scan insert update delete select part5Timer
+all: csv2heapfile scan insert update delete select timer
 
 scan: scan.cc heapfileLib.o pageLib.o recordLib.o
 	$(CC) -o $@ $< heapfileLib.o pageLib.o recordLib.o
@@ -26,7 +26,7 @@ delete: delete.cc heapfileLib.o pageLib.o recordLib.o
 select: select.cc heapfileLib.o pageLib.o recordLib.o
 	$(CC) -o $@ $< heapfileLib.o pageLib.o recordLib.o
 
-part5Timer: part5Timer.cc
+timer: timer.cc
 	$(CC) -o $@ $<
 
 recordLib.o: recordLib.cc recordLib.h
@@ -39,4 +39,4 @@ heapfileLib.o: heapfileLib.cc heapfileLib.h
 	$(CC) -o heapfileLib.o -c heapfileLib.cc
 
 clean:
-	rm -f part5Timer csv2heapfile insert scan update delete select *.o 
+	rm -f timer csv2heapfile insert scan update delete select *.o 

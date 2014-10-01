@@ -15,6 +15,7 @@ c1hongxu
 	- pageLib.cc
 	- pageLib.h
 	- write_fixed_len_pages.cc
+	- read_fixed_len_pages.cc
 
 4:
 - Relevant files 
@@ -25,7 +26,7 @@ c1hongxu
 	- scan.cc
 	- select.cc
 	- update.cc
-	- part5timer.cc
+	- timer.cc
 	- bigCsv.csv
 
 5:

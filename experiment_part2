@@ -1,0 +1,2 @@
+- Record length = 100 attributes * 10 bytes = 1000 bytes
+- When using fixed_len_sizeof, since strlen bases the length of the data on the null termination character, since each attribute is exactly 10 bytes, attributes with ten characters will have the null termination character not included, thus the length varies when using fixed_len_sizeof but is roughly in the range of ~1000 bytes. (Actual cost ~1210 bytes)
