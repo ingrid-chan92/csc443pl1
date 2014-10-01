@@ -45,7 +45,7 @@ int main(int argc, char ** argv) {
 	system("csv2heapfile bigCsv heapfile 4000");
 	runTimer("select heapfile 0 A AZ 4000", 4000);
 	runTimer("select heapfile 0 A MZ 4000", 4000);
-	runTimer("select heapfile 0 A ZZ 4000", 4000);
+	runTimer("select heapfile 0 A Z 4000", 4000);
 
 	// remove temporary output redirection file
 	system("rm -f tmp");

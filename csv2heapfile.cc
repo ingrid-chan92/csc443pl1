@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
 			PageID pageId = alloc_page(heapfile);
 			write_page(page, heapfile, pageId);
 
+			free(page->data);
 			init_fixed_len_page(page, pageSize, SLOT_SIZE);	
   
 		}
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
 	fclose(outFile);	
 
 	free(heapfile);
+	free(page->data);
 	free(page);
 
 	return 0;
