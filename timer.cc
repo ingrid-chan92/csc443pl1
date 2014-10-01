@@ -10,5 +10,5 @@ int main(int argc, char ** argv) {
    	system("csv2heapfile bigCsv heapfile 4000");
 	time(&after);
 
-	printf("Time taken to process csv2heapfile: %lu\n", (after - before));
+	printf("Time taken to process csv2heapfile: %lu - %lu = %lu\n", after, before, (after - before));
 }

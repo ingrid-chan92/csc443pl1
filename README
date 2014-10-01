@@ -10,8 +10,23 @@ c1hongxu
 - Relevant files:
 	- recordLib.cc
 	- recordLib.h
+3:
+- Relevant files:
+	- pageLib.cc
+	- pageLib.h
+	- write_fixed_len_pages.cc
 
 4:
 - Relevant files 
 	- heapfileLib.h 
 	- heapfileLib.cc
+	- delete.cc
+	- insert.cc
+	- scan.cc
+	- select.cc
+	- update.cc
+	- part5timer.cc
+	- bigCsv.csv
+
+5:
+- Relevant files
