@@ -14,7 +14,7 @@ void init_fixed_len_page(Page *page, int page_size, int slot_size) {
 	int slot_bytes = sizeof(int) + (int)ceil((1.0)*page_size/slot_size/8);
 	int slot_available = (page_size)/(slot_size) - (int)ceil(1.0*slot_bytes/slot_size);
 	int *slot_loc = (int *)page->data + page_size - BYTE_OFFSET;
-	*slot_loc = slot_available;
+	*slot_loc = slot_available; 
 }
 
 /**
