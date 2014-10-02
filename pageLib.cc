@@ -21,7 +21,14 @@ void init_fixed_len_page(Page *page, int page_size, int slot_size) {
 * Calculates the maximal number of records that fit in a page
 */
 int fixed_len_page_capacity(Page *page) {;
+
 	int *slot_loc = (int *)page->data + page->page_size - BYTE_OFFSET;
+	if (!(*slot_loc)) {
+		int slot_bytes = sizeof(int) + (int)ceil((1.0)*page->page_size/page->slot_size/8);
+		int slot_available = (page->page_size)/(page->slot_size) - (int)ceil(1.0*slot_bytes/page->slot_size);
+		int *slot_loc = (int *)page->data + page->page_size - BYTE_OFFSET;
+		*slot_loc = slot_available; 
+	}
 	return *slot_loc;
 }
 
@@ -108,11 +115,7 @@ void read_fixed_len_page(Page *page, int slot, Record *r) {
 	if (slot <= fixed_len_page_capacity(page)) {
 		//read slot if it has something there
 		if ((*slot_ptr & (1<<slot_pos))) {
-			printf ("read a page capacity is: %d\n\n", fixed_len_page_capacity(page));
-			printf("read slot_byte: %d\n", slot_byte);
-			printf("read slot_pos: %d\n", slot_pos);
 			fixed_len_read((void *)((char *)page->data + slot*page->slot_size), page->slot_size, r);
-			printf ("read b page capacity is: %d\n\n", fixed_len_page_capacity(page));
 		}
 	}
 };

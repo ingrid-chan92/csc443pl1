@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 		} 
 		else {
 			//printf("page full \n\n", add_fixed_len_page(csvPage, &csvRecord));
-			printf ("page capacity is: %d\n\n", fixed_len_page_capacity(csvPage));
+			//printf ("page capacity is: %d\n\n", fixed_len_page_capacity(csvPage));
 			fwrite (csvPage->data, sizeof(char), csvPageSize, pageFile);
 			pageCount++;
 			

@@ -39,21 +39,16 @@ int main(int argc, char *argv[])
 		if(readNumber == 0) {
 			break;
 		}
-		printf("on page: %d\n\n", page_count++);
-		printf ("page capacity is: %d\n\n", fixed_len_page_capacity(csvPage));
 		for (int i = 0; i < fixed_len_page_capacity(csvPage); i++){
-						
 			if (hasData(csvPage, i)){
+				
 				//printf("in");
-				printf ("apage capacity is: %d\n\n", fixed_len_page_capacity(csvPage));
 				read_fixed_len_page(csvPage, i, &csvRecord);
-				printf ("bpage capacity is: %d\n\n", fixed_len_page_capacity(csvPage));
 				//printf("i: %d\n", i);
 				for(int j = 0; j < csvRecord.size(); j++){
 					//printf("j: %d\n", j);	
 					//DO NOT REMOVE THIS PRINTF			
 					printf("%s", csvRecord[j]);
-					printf ("page capacity is: %d\n\n", fixed_len_page_capacity(csvPage));
 					if (j != csvRecord.size() - 1) {
 						printf(",");
 					} else {
@@ -64,7 +59,6 @@ int main(int argc, char *argv[])
 				
 			}
 		}
-		printf ("page capacity is: %d\n\n", fixed_len_page_capacity(csvPage));
 	}
 
 	
