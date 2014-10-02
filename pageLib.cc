@@ -108,7 +108,11 @@ void read_fixed_len_page(Page *page, int slot, Record *r) {
 	if (slot <= fixed_len_page_capacity(page)) {
 		//read slot if it has something there
 		if ((*slot_ptr & (1<<slot_pos))) {
+			printf ("read a page capacity is: %d\n\n", fixed_len_page_capacity(page));
+			printf("read slot_byte: %d\n", slot_byte);
+			printf("read slot_pos: %d\n", slot_pos);
 			fixed_len_read((void *)((char *)page->data + slot*page->slot_size), page->slot_size, r);
+			printf ("read b page capacity is: %d\n\n", fixed_len_page_capacity(page));
 		}
 	}
 };

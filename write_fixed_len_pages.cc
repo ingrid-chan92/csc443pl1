@@ -6,10 +6,14 @@
 
 int main(int argc, char *argv[])
 {	
+	if (argc < 4) {
+		printf("Usage: write_fixed_len_pages <csv_file> <page_file> <page_size>\n");
+		return 0;
+	}
 
 	int csvPageSize = atoi(argv[3]);
 	FILE *csvFile;
-	char csvBuffer[1100];
+	char csvBuffer[1101];
 	char *csvEntry;
 	Record csvRecord;	
 	Page *csvPage; 
@@ -28,7 +32,7 @@ int main(int argc, char *argv[])
 		perror ("Error opening file");
 
 	csvPage = (Page *)malloc(sizeof(Page));
-	init_fixed_len_page(csvPage, csvPageSize, 1000);
+	init_fixed_len_page(csvPage, csvPageSize, SLOT_SIZE);
 
 	//printf("page size is %d \n", csvPageSize);
 
@@ -54,7 +58,6 @@ int main(int argc, char *argv[])
   		}
 		recordCount++;
 
-		fixed_len_page_freeslots(csvPage);
 		//write it into page
 		//printf("slots left: %d \n", fixed_len_page_freeslots(csvPage));
 		if (fixed_len_page_freeslots(csvPage) > 0) {
@@ -62,17 +65,20 @@ int main(int argc, char *argv[])
 			//printf("added to index: %d \n\n", add_fixed_len_page(csvPage, &csvRecord));
 		} 
 		else {
-			//printf("page full \n", add_fixed_len_page(csvPage, &csvRecord));
+			//printf("page full \n\n", add_fixed_len_page(csvPage, &csvRecord));
+			printf ("page capacity is: %d\n\n", fixed_len_page_capacity(csvPage));
 			fwrite (csvPage->data, sizeof(char), csvPageSize, pageFile);
 			pageCount++;
-
-			//zero out the data.
-			csvPage->data = NULL;
-			csvPage->data = (void *)malloc(csvPageSize);
 			
+			//zero out the data.
+			//free(csvPage->data);
+			//csvPage->data = NULL;
+			//csvPage->data = (void *)malloc(csvPageSize);
+			
+			memset ( csvPage->data, 0, csvPageSize-sizeof(int));
 			//continue writing.			
-			csvPage = (Page *)malloc(sizeof(Page));
-			init_fixed_len_page(csvPage, csvPageSize, 1000);
+			//csvPage = (Page *)malloc(sizeof(Page));
+			//init_fixed_len_page(csvPage, csvPageSize, SLOT_SIZE);
 			add_fixed_len_page(csvPage, &csvRecord);
 			//printf("added to index: %d \n\n", add_fixed_len_page(csvPage, &csvRecord));
 		}
@@ -80,8 +86,8 @@ int main(int argc, char *argv[])
 		csvRecord.clear();		
 	}
 	
-	//write any remaining page into file
-	if (fixed_len_page_capacity(csvPage) && 0 < fixed_len_page_freeslots(csvPage)){
+	//write any remaining page data into file
+	if (fixed_len_page_freeslots(csvPage) < fixed_len_page_capacity(csvPage)){
 		fwrite (csvPage->data, sizeof(char), csvPageSize, pageFile);
 		pageCount++;
 	}
