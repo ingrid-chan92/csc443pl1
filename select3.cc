@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 			while (returnIt.hasNext()) {
 				Record inner = returnIt.next();
 				if (strcmp(inner[0], outer[0]) == 0) {
-					printf("%s : %s\n", outer[1], inner[1]);
+					printf("%s\n", inner[1]);
 					break;
 				}
 				inner.clear();
