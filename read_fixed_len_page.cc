@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
 	char *target_ptr;
 
 	timeval tim;
-    gettimeofday(&tim, NULL);
-    double t1=tim.tv_sec+(tim.tv_usec/1000000.0);
+	gettimeofday(&tim, NULL);
+	double t1=tim.tv_sec+(tim.tv_usec/1000000.0);
 
 	pageFile = fopen (argv[1] , "r");
 	if (pageFile == NULL) 
@@ -29,8 +29,6 @@ int main(int argc, char *argv[])
 
 	csvPage = (Page *)malloc(sizeof(Page));
 	init_fixed_len_page(csvPage, csvPageSize, SLOT_SIZE);
-
-	//printf("page size is %d \n", csvPageSize);
 
 	int page_count = 0;
 	while ( ! feof (pageFile) )
@@ -41,12 +39,9 @@ int main(int argc, char *argv[])
 		}
 		for (int i = 0; i < fixed_len_page_capacity(csvPage); i++){
 			if (hasData(csvPage, i)){
-				
-				//printf("in");
+
 				read_fixed_len_page(csvPage, i, &csvRecord);
-				//printf("i: %d\n", i);
 				for(int j = 0; j < csvRecord.size(); j++){
-					//printf("j: %d\n", j);	
 					//DO NOT REMOVE THIS PRINTF			
 					printf("%s", csvRecord[j]);
 					if (j != csvRecord.size() - 1) {
@@ -63,14 +58,9 @@ int main(int argc, char *argv[])
 
 	
 	gettimeofday(&tim, NULL);
-    double t2=tim.tv_sec+(tim.tv_usec/1000000.0);
-    //printf("%.6lf seconds elapsed\n", t2-t1);
+	double t2=tim.tv_sec+(tim.tv_usec/1000000.0);
 
 	printf("TIME: %f \n", (t2-t1)*1000);
-	//printf("TIME END: %f \n", end);
-
-	//printf("page capacity: %d\n", fixed_len_page_capacity(csvPage));
-	//printf("free slots: %d\n", fixed_len_page_freeslots(csvPage));
 	fclose(pageFile);
 	free(csvPage->data);
 	free(csvPage);

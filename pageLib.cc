@@ -74,8 +74,7 @@ void write_fixed_len_page(Page *page, int slot, Record *r) {
 	int slot_byte = slot / sizeof(char *);
 	int slot_pos = slot % sizeof(char *);
 	char *slot_ptr = (char *)page->data+page->page_size-slot_byte-BYTE_OFFSET;
-	//printf("write slot_byte: %d\n", slot_byte);
-	//printf("write slot_pos: %d\n", slot_pos);
+
 	if (slot <= fixed_len_page_capacity(page)) {
 		fixed_len_write(r, (void *)((char *)page->data + slot*page->slot_size));
 		*slot_ptr = *slot_ptr | (1<<slot_pos);
@@ -90,8 +89,7 @@ bool write_fixed_len_page_strict(Page *page, int slot, Record *r) {
 	int slot_byte = slot / sizeof(char *);
 	int slot_pos = slot % sizeof(char *);
 	char *slot_ptr = (char *)page->data+page->page_size-slot_byte-BYTE_OFFSET;
-	//printf("strict write slot_byte: %d\n", slot_byte);
-	//printf("strict write slot_pos: %d\n", slot_pos);
+
 	if (slot <= fixed_len_page_capacity(page)) {
 		if (!(*slot_ptr & (1<<slot_pos))) {
 			fixed_len_write(r, (void *)((char *)page->data + slot*page->slot_size));
@@ -110,8 +108,7 @@ void read_fixed_len_page(Page *page, int slot, Record *r) {
 	int slot_byte = slot / sizeof(char *);
 	int slot_pos = slot % sizeof(char *);
 	char *slot_ptr = (char *)page->data+page->page_size-slot_byte-BYTE_OFFSET;
-	//printf("read slot_byte: %d\n", slot_byte);
-	//printf("read slot_pos: %d\n", slot_pos);
+
 	if (slot <= fixed_len_page_capacity(page)) {
 		//read slot if it has something there
 		if ((*slot_ptr & (1<<slot_pos))) {
@@ -139,7 +136,6 @@ int add_fixed_len_page(Page *page, Record *r) {
 			break;
 		}
 	}
-	//printf("add slot num: %d\n", slot_num);
 	return slot_num;
 }
 
@@ -156,6 +152,13 @@ void remove_entry(Page* page, int slot) {
 	if (slot <= fixed_len_page_capacity(page)) {
 		mask = (255<<slot_pos+1 | 255>>8-slot_pos);
 		*slot_ptr = *slot_ptr & mask;
-		//memset ( page->data + slot*page->slot_size, 0, page->slot_size);
+		memset ( (char *)page->data + slot*page->slot_size, 0, page->slot_size);
 	}
+};
+
+/*
+*Zero out data in the entire page
+*/
+void wipe_data(Page* page) {
+	memset ( (char *)page->data, 0, page->page_size-sizeof(int));
 };

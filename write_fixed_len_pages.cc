@@ -34,17 +34,10 @@ int main(int argc, char *argv[])
 	csvPage = (Page *)malloc(sizeof(Page));
 	init_fixed_len_page(csvPage, csvPageSize, SLOT_SIZE);
 
-	//printf("page size is %d \n", csvPageSize);
 
 	while ( ! feof (csvFile) )
 	{
-		/*
-		read_number = fgets (csvBuffer,sizeof(char),1100,csvFile);
-		if(read_number < 1100) {
-			csvBuffer[read_number] = '\0';
-			printf("extra: %s \n\n", csvBuffer);
-		}
-		*/
+	
 		if (fgets(csvBuffer, 1101, csvFile) == NULL){
 			break;
 		}
@@ -59,28 +52,20 @@ int main(int argc, char *argv[])
 		recordCount++;
 
 		//write it into page
-		//printf("slots left: %d \n", fixed_len_page_freeslots(csvPage));
 		if (fixed_len_page_freeslots(csvPage) > 0) {
 			add_fixed_len_page(csvPage, &csvRecord);
-			//printf("added to index: %d \n\n", add_fixed_len_page(csvPage, &csvRecord));
+			
 		} 
 		else {
-			//printf("page full \n\n", add_fixed_len_page(csvPage, &csvRecord));
-			//printf ("page capacity is: %d\n\n", fixed_len_page_capacity(csvPage));
 			fwrite (csvPage->data, sizeof(char), csvPageSize, pageFile);
 			pageCount++;
 			
-			//zero out the data.
-			//free(csvPage->data);
-			//csvPage->data = NULL;
-			//csvPage->data = (void *)malloc(csvPageSize);
-			
-			memset ( csvPage->data, 0, csvPageSize-sizeof(int));
+			//recycle page data
+			wipe_data(csvPage);
+
 			//continue writing.			
-			//csvPage = (Page *)malloc(sizeof(Page));
-			//init_fixed_len_page(csvPage, csvPageSize, SLOT_SIZE);
 			add_fixed_len_page(csvPage, &csvRecord);
-			//printf("added to index: %d \n\n", add_fixed_len_page(csvPage, &csvRecord));
+			
 		}
 
 		csvRecord.clear();		
@@ -100,7 +85,6 @@ int main(int argc, char *argv[])
 	printf("NUMBER OF RECORDS: %d \n", recordCount);
 	printf("NUMBER OF PAGES: %d \n", pageCount);
 	printf("TIME: %f \n", (t2-t1)*1000);
-	//printf("TIME END: %f \n", end);
 
 	fclose (csvFile);
 	fclose (pageFile);
