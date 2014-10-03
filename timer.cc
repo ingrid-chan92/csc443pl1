@@ -26,26 +26,26 @@ void runSelectTimer(std::string select, std::string initCommand, int pagesize) {
 int main(int argc, char ** argv) {
 
 	printf("CSV2heapfile results: \n");
-	runTimer("csv2heapfile bigCsv heapfile 2000", 2000);
-	runTimer("csv2heapfile bigCsv heapfile 4000", 4000);
-	runTimer("csv2heapfile bigCsv heapfile 6000", 6000);
-	runTimer("csv2heapfile bigCsv heapfile 8000", 8000);
-	runTimer("csv2heapfile bigCsv heapfile 10000", 10000);
-	runTimer("csv2heapfile bigCsv heapfile 12000", 12000);
+	runTimer("./csv2heapfile superBigCsv heapfile 2000", 2000);
+	runTimer("./csv2heapfile superBigCsv heapfile 4000", 4000);
+	runTimer("./csv2heapfile superBigCsv heapfile 6000", 6000);
+	runTimer("./csv2heapfile superBigCsv heapfile 8000", 8000);
+	runTimer("./csv2heapfile superBigCsv heapfile 10000", 10000);
+	runTimer("./csv2heapfile superBigCsv heapfile 12000", 12000);
 
 	printf("\n\nSelect results w/ varying page size: \n");	
-	runSelectTimer("select heapfile 0 J JZ 2000", "csv2heapfile bigCsv heapfile 2000", 2000);
-	runSelectTimer("select heapfile 0 J JZ 4000", "csv2heapfile bigCsv heapfile 4000", 4000);
-	runSelectTimer("select heapfile 0 J JZ 6000", "csv2heapfile bigCsv heapfile 6000", 6000);
-	runSelectTimer("select heapfile 0 J JZ 8000", "csv2heapfile bigCsv heapfile 8000", 8000);
-	runSelectTimer("select heapfile 0 J JZ 10000", "csv2heapfile bigCsv heapfile 10000", 10000);
-	runSelectTimer("select heapfile 0 J JZ 12000", "csv2heapfile bigCsv heapfile 12000", 12000);
+	runSelectTimer("./select heapfile 0 J JZ 2000", "./csv2heapfile superBigCsv heapfile 2000", 2000);
+	runSelectTimer("./select heapfile 0 J JZ 4000", "./csv2heapfile superBigCsv heapfile 4000", 4000);
+	runSelectTimer("./select heapfile 0 J JZ 6000", "./csv2heapfile superBigCsv heapfile 6000", 6000);
+	runSelectTimer("./select heapfile 0 J JZ 8000", "./csv2heapfile superBigCsv heapfile 8000", 8000);
+	runSelectTimer("./select heapfile 0 J JZ 10000", "./csv2heapfile superBigCsv heapfile 10000", 10000);
+	runSelectTimer("./select heapfile 0 J JZ 12000", "./csv2heapfile superBigCsv heapfile 12000", 12000);
 
 	printf("\n\nSelect results w/ varying search range: \n");	
-	system("csv2heapfile bigCsv heapfile 4000");
-	runTimer("select heapfile 0 A AZ 4000", 4000);
-	runTimer("select heapfile 0 A MZ 4000", 4000);
-	runTimer("select heapfile 0 A Z 4000", 4000);
+	system("./csv2heapfile superBigCsv heapfile 4000");
+	runTimer("./select heapfile 0 A AZ 4000", 4000);
+	runTimer("./select heapfile 0 A MZ 4000", 4000);
+	runTimer("./select heapfile 0 A Z 4000", 4000);
 
 	// remove temporary output redirection file
 	system("rm -f tmp");
