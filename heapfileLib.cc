@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "heapfileLib.h"
 
@@ -16,7 +17,8 @@ RecordIterator::RecordIterator(Heapfile *heapfile) {
 	currDirEntry = (DirEntry *) malloc(sizeof(DirEntry));
 	currPage = (Page *) malloc (heapfile->page_size);
 	init_fixed_len_page(currPage, heapfile->page_size, SLOT_SIZE);
-	currRecord = (Record *) malloc(SLOT_SIZE);
+	currRecord.clear();
+	currRecordCopy.clear();
 
 	currHeapfile = heapfile;
 
@@ -32,25 +34,26 @@ Record RecordIterator::next() {
 	bool isRecordLast = true;
 	int nextSlot=0;
 
-	if (currRecord == NULL) {
+	if (currRecord.size() == 0) {
 		// Nothing left to process. Throw exception if called
 		throw;
 	}			
 
-	Record prevRecord = *currRecord;
+	currRecordCopy = currRecord;
 
 	//If recordPtr is not at last record or if it is not empty, get next record + increment recordPtr + goto endResult
-	for (int j = currPageSlot + 1; j <currPageMaxSlots; j++) {
+	for (int j = currPageSlot + 1; j < currPageMaxSlots; j++) {
 		if (hasData(currPage, j)){
 			nextSlot=j;
 			isRecordLast = false;
 			break;
 		}
 	}
+
 	// Else, read a new page
 	if (!isRecordLast) {
-		currRecord->clear();
-		read_fixed_len_page(currPage, nextSlot, currRecord);
+		currRecord.clear();
+		read_fixed_len_page(currPage, nextSlot, &currRecord);
 		currPageSlot=nextSlot;
 	} else {
 		// Else, read a new page
@@ -77,11 +80,11 @@ Record RecordIterator::next() {
 		}
 	}
 			
-	return prevRecord;
+	return currRecordCopy;
 }
 
 bool RecordIterator::hasNext() {
-	return currRecord != NULL;
+	return currRecord.size() > 0;
 }
 
 /**
@@ -91,9 +94,7 @@ void RecordIterator::cleanup() {
 	free(currDir);
 	free(currDirEntry);
 	free(currPage);
-	free(currRecord);
-
-	currRecord = NULL;
+	currRecord.clear();
 }
 
 /**
@@ -110,13 +111,14 @@ void RecordIterator::readPageFromDirectory() {
 
 	// read in page from directory
 	_read_page(currHeapfile, currPage, currDirEntry, 0);
-
 	// Get first record from page and set as currRecord
+	currRecord.clear();
+
 	currPageMaxSlots = fixed_len_page_capacity(currPage);
 	for (int i = 0; i < currPageMaxSlots; i++){
 		if (hasData(currPage, i)){
-			currRecord->clear();
-			read_fixed_len_page(currPage, i, currRecord);
+			currRecord.clear();
+			read_fixed_len_page(currPage, i, &currRecord);
 			currPageSlot=i;
 			break;
 		}
