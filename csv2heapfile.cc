@@ -35,13 +35,12 @@ int main(int argc, char **argv) {
 
 		// Write record into page
 		if (fixed_len_page_freeslots(page) == 0) {  
+
 			// Current page is full. Write page to heap and start new page
 			PageID pageId = alloc_page(heapfile);
 			write_page(page, heapfile, pageId);
 
-			free(page->data);
-			init_fixed_len_page(page, pageSize, SLOT_SIZE);	
-  
+			memset(page->data, 0, pageSize - sizeof(int));  
 		}
 		add_fixed_len_page(page, &record);				
 	}
