@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include "recordLib.h"
 
 /**
@@ -42,7 +43,9 @@ void fixed_len_read(void *buf, int size, Record *record) {
 	while ((bytesRead + ATTR_SIZE) <= size) {
 		char *attr = (char *) malloc(ATTR_SIZE);
 		memcpy(attr, ptr, ATTR_SIZE);
-		(*record).push_back(attr);
+		(*record).push_back(std::string(attr).c_str());
+
+		free(attr);
 
 		// move ptr forward
 		ptr += ATTR_SIZE;
