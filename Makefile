@@ -1,6 +1,6 @@
 CC = g++
 
-all: csv2heapfile scan insert update delete select timer write_fixed_len_pages read_fixed_len_page
+all: csv2heapfile scan insert update delete select timer write_fixed_len_pages read_fixed_len_page csv2colstore select2 select3
 
 scan: scan.cc heapfileLib.o pageLib.o recordLib.o
 	$(CC) -g -o $@ $< heapfileLib.o pageLib.o recordLib.o
@@ -48,4 +48,4 @@ heapfileLib.o: heapfileLib.cc heapfileLib.h
 	$(CC) -g -o heapfileLib.o -c heapfileLib.cc
 
 clean:
-	rm -f timer csv2heapfile insert scan update delete select csv2colstore select2 select3 *.o 
+	rm -f timer csv2heapfile insert scan update delete select csv2colstore select2 select3 *.o write_fixed_len_pages read_fixed_len_page

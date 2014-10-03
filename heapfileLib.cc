@@ -93,6 +93,7 @@ bool RecordIterator::hasNext() {
 void RecordIterator::cleanup() {
 	free(currDir);
 	free(currDirEntry);
+	free(currPage->data);
 	free(currPage);
 	currRecord.clear();
 }

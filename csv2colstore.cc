@@ -41,6 +41,10 @@ int main(int argc, char **argv) {
 	for (int i = 0; i < 100; i++) {
 		heapfiles[i] = (Heapfile *) malloc(sizeof(Heapfile));
 		outFiles[i] = fopen(getFilename(dirname, i).c_str(), "w+");
+		if (outFiles[i] == NULL) {
+			printf("ERROR: Problem creating colstore heapfiles\n");
+			return 1;
+		}
 		init_heapfile(heapfiles[i], pageSize, outFiles[i]);
 	}
 
@@ -48,28 +52,29 @@ int main(int argc, char **argv) {
 	init_fixed_len_page(page, pageSize, SLOT_SIZE);
 
 	char line[2048];	
+	int tupleId = 0;
 	while (fgets(line, 2048, inFile)) {   
 		char *token = strtok(line, ",");
-		int tupleId = 0;
-
+		int heapfileId = 0;
 	   	while(token != NULL) {
 			Record record;
-			record.push_back(token);
+			record.push_back(toString(tupleId).c_str());
 			record.push_back(token);			
-			
+		
 			// insert each attribute into corresponding heapfile
-			PageID pageId = getPageForInsertion(heapfiles[tupleId]);
-			read_page(heapfiles[tupleId], pageId, page);
+			PageID pageId = getPageForInsertion(heapfiles[heapfileId]);
+			read_page(heapfiles[heapfileId], pageId, page);
 			add_fixed_len_page(page, &record);			
-			write_page(page, heapfiles[tupleId], pageId);
+			write_page(page, heapfiles[heapfileId], pageId);
 
 			// release page
 			memset(page->data, 0, pageSize - sizeof(int));  
 
 			record.clear();
-			token = strtok(NULL, ",");
-			tupleId++;
+			token = strtok(NULL, ",");	
+			heapfileId++;		
 	   	}
+		tupleId++;
 	}	
 	free(page);
 
