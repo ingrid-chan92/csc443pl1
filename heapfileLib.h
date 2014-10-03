@@ -39,7 +39,8 @@ class RecordIterator {
 	char *currDir;
 	DirEntry *currDirEntry;
 	Page *currPage;
-	Record *currRecord;
+	Record currRecord;
+	Record currRecordCopy;
 	int currPageSlot;
 	int currPageMaxSlots;
 	int dirEntryPtr, recordPtr, maxDirEntries;
