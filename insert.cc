@@ -19,33 +19,40 @@ int main(int argc, char **argv) {
 	heapfile->file_ptr = outFile;
 	heapfile->page_size = pageSize;
     	
-	// Write file into heap
 	char line[2048];
 	Page *page = (Page *) malloc(pageSize);
 	init_fixed_len_page(page, pageSize, SLOT_SIZE);
 
+	// Get first page with freespace
+	int pageId = getPageForInsertion(heapfile);	
+	read_page(heapfile, pageId, page);
+
 	// Select first page with freespace
-	PageID pageId;
-	while (fgets(line, 2048, inFile)) { 
-		pageId = getPageForInsertion(heapfile);	
-		read_page(heapfile, pageId, page);
-  
+	while (fgets(line, 2048, inFile)) { 		
+		// Get new page if current page is full
+		if (pageId == -1) {	
+			pageId = getPageForInsertion(heapfile);	
+			read_page(heapfile, pageId, page);
+		}  		
+
 		// Convert line into record
 		Record record;
 		char *token = strtok(line, ",");   
+
 	   	// walk through each attr and push to record
 	   	while(token != NULL) {
 		 	record.push_back(token);	    
 		 	token = strtok(NULL, ",");
-	   	}
-
+	   	}		
+		
 		add_fixed_len_page(page, &record);	
 
 		if (fixed_len_page_freeslots(page) == 0) {  
-			// Current page is full. Write page to heap and start new page	
+			// Current page is full. Write page to heap
 			write_page(page, heapfile, pageId);
-			pageId = -1;	
-		}		
+			memset(page->data, 0, pageSize - sizeof(int));  
+			pageId = -1;
+		}
 	}
 	
 	// Write any remaining data into heap
