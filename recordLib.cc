@@ -40,8 +40,10 @@ void fixed_len_read(void *buf, int size, Record *record) {
 
 	// Record all complete attributes into record
 	while ((bytesRead + ATTR_SIZE) <= size) {
-		char *attr = (char *) malloc(ATTR_SIZE);
+		char *attr = (char *) malloc(ATTR_SIZE+1);
 		memcpy(attr, ptr, ATTR_SIZE);
+		attr[ATTR_SIZE] ='\0'; 
+
 		(*record).push_back(attr);
 		
 		// move ptr forward
@@ -60,9 +62,7 @@ int i =0;
 	{
 
 		junk = const_cast<char*>(record->back());
-//printf("%d:\n", i++;
 		record->pop_back();
 		free(junk);
 	}
-//printf("out\n");
 }
