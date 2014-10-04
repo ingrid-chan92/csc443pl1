@@ -46,9 +46,9 @@ if __name__ == "__main__":
     for pgsize in range(2,33):
         output = cmd(['./write_fixed_len_pages', 'tuples', 'results'+str(pgsize*1000) , str(pgsize*1000)])
         time = output.splitlines()
-        millisec = time[2].split()
+        millisec = time[-1].split()
         graph_value.append(float(millisec[1]))
-        sleep(1.0)
+        sleep(5.5)
     
     #+print graph_value 
    

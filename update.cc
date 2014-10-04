@@ -41,14 +41,18 @@ int main(int argc, char **argv) {
 	read_fixed_len_page(page, recordId.slot, &record);
 
 	// Modify attribute of record
+	free(const_cast<char*>(record.at(attributeId)));
 	record.at(attributeId) = newValue;
 
 	// Write record back to heapfile
 	write_fixed_len_page(page, recordId.slot, &record);
 	write_page(page, heapfile, recordId.page_id);
 
+	record.erase(record.begin()+attributeId);
+	free_record(&record);
 	fclose(outFile);	
 	free(heapfile);
+	free(page->data);
 	free(page);
 
 	return 0;

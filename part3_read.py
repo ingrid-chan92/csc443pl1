@@ -48,7 +48,7 @@ if __name__ == "__main__":
         time = output.splitlines()
         millisec = time[-1].split()
         graph_value.append(float(millisec[1]))
-        sleep(1.0)
+        sleep(5.5)
     
     #+print graph_value 
    

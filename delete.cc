@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
 
 	fclose(outFile);	
 	free(heapfile);
+	free(page->data);
 	free(page);
 
 }

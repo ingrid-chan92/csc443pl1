@@ -17,8 +17,6 @@ RecordIterator::RecordIterator(Heapfile *heapfile) {
 	currDirEntry = (DirEntry *) malloc(sizeof(DirEntry));
 	currPage = (Page *) malloc (heapfile->page_size);
 	init_fixed_len_page(currPage, heapfile->page_size, SLOT_SIZE);
-	currRecord.clear();
-	currRecordCopy.clear();
 
 	currHeapfile = heapfile;
 
@@ -84,7 +82,15 @@ Record RecordIterator::next() {
 }
 
 bool RecordIterator::hasNext() {
-	return currRecord.size() > 0;
+	return !currRecord.empty();
+}
+
+/**
+ *	force free of currRecord and currRecordCopy
+ */
+void RecordIterator::forceFree() {
+	free_record(&currRecord);
+	cleanup();	
 }
 
 /**
@@ -113,8 +119,6 @@ void RecordIterator::readPageFromDirectory() {
 	// read in page from directory
 	_read_page(currHeapfile, currPage, currDirEntry, 0);
 	// Get first record from page and set as currRecord
-	currRecord.clear();
-
 	currPageMaxSlots = fixed_len_page_capacity(currPage);
 	for (int i = 0; i < currPageMaxSlots; i++){
 		if (hasData(currPage, i)){

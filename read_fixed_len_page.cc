@@ -50,18 +50,18 @@ int main(int argc, char *argv[])
 						printf("\n");
 					}
 				}
-				csvRecord.clear();
 				
+				free_record(&csvRecord);
 			}
 		}
 	}
 
-	
 	gettimeofday(&tim, NULL);
 	double t2=tim.tv_sec+(tim.tv_usec/1000000.0);
 
 	printf("TIME: %f \n", (t2-t1)*1000);
 	fclose(pageFile);
+	//free(pageFile);
 	free(csvPage->data);
 	free(csvPage);
 	return 0;

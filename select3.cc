@@ -16,7 +16,7 @@ void initializeHeapfile(std::string filename, Heapfile *heapfile, int pageSize) 
 
 int main(int argc, char *argv[])
 {	
-	if (argc < 6) {
+	if (argc < 7) {
 		printf("Usage: select3  <colstore_name> <attribute_id> <return_attribute_id> <start> <end> <page_size>\n");
 		return 0;
 	}
@@ -50,19 +50,21 @@ int main(int argc, char *argv[])
 				Record inner = returnIt.next();
 				if (strcmp(inner[0], outer[0]) == 0) {
 					printf("%s\n", inner[1]);
+					free_record(&inner);
 					break;
 				}
-				inner.clear();
+				free_record(&inner);
 			}
 			
 			if (returnIt.hasNext()) {
-				returnIt.cleanup();
+				returnIt.forceFree();
 			}			
-			returnIt = RecordIterator(returnHeap);
+			returnIt = RecordIterator(returnHeap); 
 		}
-		outer.clear();
+		free_record(&outer);
 	}
 
+	returnIt.forceFree();
 	fclose(searchHeap->file_ptr);
 	fclose(returnHeap->file_ptr);
 	free(searchHeap);

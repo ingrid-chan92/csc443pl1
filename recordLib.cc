@@ -50,12 +50,19 @@ void fixed_len_read(void *buf, int size, Record *record) {
 	}
 }
 
-void free_record(Record *record) {
-	char *junk;	
+/**
+ * frees all record elements.
+ */
+void free_record(Record *record) {	
+int i =0;
+	char *junk;
 	while (!record->empty())
 	{
+
 		junk = const_cast<char*>(record->back());
+//printf("%d:\n", i++;
 		record->pop_back();
 		free(junk);
 	}
+//printf("out\n");
 }

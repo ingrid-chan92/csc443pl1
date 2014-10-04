@@ -27,8 +27,9 @@ int main(int argc, char *argv[])
 		if (strcmp(start, record[attr]) <= 0 && strcmp(end, record[attr]) >= 0) {
 			printf("%s\n", record[attr]);
 		}
-		record.clear();
+		free_record(&record);
 	}
 
+	free(heapFile);
 	return 0;
 }

@@ -18,7 +18,6 @@ int main(int argc, char *argv[])
 	heapFile->page_size = pageSize;
 
 	RecordIterator r = RecordIterator(heapFile);
-
 	while(r.hasNext()){
 		heapRecord = r.next();
 		for (int i = 0; i < heapRecord.size(); i++){				
@@ -29,8 +28,9 @@ int main(int argc, char *argv[])
 			}
 		}
 		printf("\n\n");
-		heapRecord.clear();
+		free_record(&heapRecord);
 	}
 
+	free(heapFile);
 	return 0;
 }

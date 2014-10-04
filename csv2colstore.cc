@@ -76,6 +76,7 @@ int main(int argc, char **argv) {
 	   	}
 		tupleId++;
 	}	
+	free(page->data);
 	free(page);
 
 	// clean up	

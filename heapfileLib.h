@@ -49,8 +49,9 @@ public:
 	RecordIterator(Heapfile *heapfile);
 	Record next();
 	bool hasNext();
-	void cleanup();
+	void forceFree();
 
 private:
+	void cleanup();
 	void readPageFromDirectory();
 };

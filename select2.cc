@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 		if (strcmp(start, record[1]) <= 0 && strcmp(end, record[1]) >= 0) {
 			printf("%s\n", record[1]);
 		}
-		record.clear();
+		free_record(&record);
 	}
 	
 	fclose(heapFile->file_ptr);
