@@ -1,4 +1,4 @@
-Results taken from running timer.cc on a CSV file of 5000000 tuples
+Results taken from running timer.cc on a CSV file of 500000 tuples
 
 CSV2heapfile results: 
 Time to process with page size 2000: 	4172.431746 s
