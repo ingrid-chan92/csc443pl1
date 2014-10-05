@@ -1,0 +1,36 @@
+Results taken from running timer2.cc on a CSV file of 80000 tuples
+
+pageSize=4000 results: 
+Time to process with page size 4000: 	3664.503367 s
+Time to process with page size 4000: 	5.486308 s
+Time to process with page size 4000: 	587.516782 s
+
+
+pageSize=8000 results: 
+Time to process with page size 8000: 	1878.900897 s
+Time to process with page size 8000: 	4.389363 s
+Time to process with page size 8000: 	573.470110 s
+
+
+pageSize=8000 varying range results: 
+Time to process with page size 8000: 	0.998375 s
+Time to process with page size 8000: 	1.025188 s
+Time to process with page size 8000: 	1.143705 s
+Time to process with page size 8000: 	187.797503 s
+Time to process with page size 8000: 	2505.714538 s
+Time to process with page size 8000: 	5023.995492 s
+
+
+pageSize=10000 results: 
+Time to process with page size 10000: 	1628.835213 s
+Time to process with page size 10000: 	6.039957 s
+Time to process with page size 10000: 	514.926367 s
+
+
+pageSize=12000 results: 
+Time to process with page size 12000: 	1462.864616 s
+Time to process with page size 12000: 	5.615710 s
+Time to process with page size 12000: 	489.860266 s
+
+
+

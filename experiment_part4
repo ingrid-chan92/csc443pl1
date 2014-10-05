@@ -1,24 +1,32 @@
-One set of results taken from running timer.cc on a CSV file of 60 tuples
+Results taken from running timer.cc on a CSV file of 500000 tuples
 
 CSV2heapfile results: 
-Time to process with page size 2000:    0.020238
-Time to process with page size 4000:    0.016786
-Time to process with page size 6000:    0.025209
-Time to process with page size 8000:    0.015510
-Time to process with page size 10000:   0.017279
-Time to process with page size 12000:   0.014949
+Time to process with page size 2000: 	4172.431746 s
+Time to process with page size 4000: 	351.938243 s
+Time to process with page size 6000: 	147.352908 s
+Time to process with page size 8000: 	89.978577 s
+Time to process with page size 10000: 	56.228505 s
+Time to process with page size 12000: 	46.317261 s
+
 
 Select results w/ varying page size: 
-Time to process with page size 2000:    0.022514
-Time to process with page size 4000:    0.012956
-Time to process with page size 6000:    0.009701
-Time to process with page size 8000:    0.017182
-Time to process with page size 10000:   0.019095
-Time to process with page size 12000:   0.007125
+Time to process with search range J - JZ and with page size 2000: 	7.250361 s
+Time to process with search range J - JZ and with page size 4000: 	6.724728 s 
+Time to process with search range J - JZ and with page size 6000: 	6.361123 s
+Time to process with search range J - JZ and with page size 8000: 	6.237534 s
+Time to process with search range J - JZ and with page size 10000: 	6.190604 s
+Time to process with search range J - JZ and with page size 12000: 	6.023810 s
 
 
 Select results w/ varying search range: 
-Time to process with search range A - AZ:    0.014072
-Time to process with search range A - MZ:    0.025450
-Time to process with search range A - Z:    	0.021469
+Time to process with search range A - AZ and page size 4000: 	6.427837 s
+Time to process with search range A - MZ and page size 4000: 	6.429306 s
+Time to process with search range A - ZZ and page size 4000: 	6.599281 s
 
+
+CSV2HEAPFILE:
+When page size increases, the performance definitively improves. With a larger page size, more data can be fit into a single page before it needs to be written into memory thus, less IOs are needed.
+
+
+SELECT:
+Unlike Csv2Heapfile, both varying page size and start/end does not effect the performance much because this implementation of SELECT has no optimization so must do a linear search with all the data every time. For varying page size, there is a slight improvement in performance because less IOs are needed to iterate through all the data. However, for search range where all the data must be iterated regardless, there is no dramatic change in performance.
