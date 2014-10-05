@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     # Run the program and create the plot.
     #output = cmd(['./time_inactive', str(num)])
-    graph_value = [];
+    graph_valuez = [];
 
     for pgsize in range(2,33):
         output = cmd(['./write_fixed_len_pages', 'tuples', 'results'+str(pgsize*1000) , str(pgsize*1000)])
