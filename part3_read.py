@@ -43,7 +43,7 @@ if __name__ == "__main__":
     #output = cmd(['./time_inactive', str(num)])
     graph_value = [];
 
-    for pgsize in range(2,33):
+    for pgsize in range(2,12):
         output = cmd(['./read_fixed_len_page', 'results'+str(pgsize*1000) , str(pgsize*1000)])
         time = output.splitlines()
         millisec = time[-1].split()
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     
     #+print graph_value 
    
-    x =range(2000,33000,1000)
+    x =range(2000,12000,1000)
 
     #make sure that the threshold line draw *after* the intervals
     plt.plot(x, graph_value, 'bd-')

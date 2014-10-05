@@ -15,7 +15,7 @@ void runTimer (std::string command, int pageSize) {
 	gettimeofday(&tim, NULL);
 	double after=tim.tv_sec+(tim.tv_usec/1000000.0);
 
-	printf("Time to process with page size %d: \t%f\n", pageSize, after - before);
+	printf("Time to process with page size %d: \t%f s\n", pageSize, after - before);
 }
 
 void runSelectTimer(std::string select, std::string initCommand, int pagesize) {
