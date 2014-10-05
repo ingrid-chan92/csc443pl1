@@ -1,36 +1,52 @@
 Results taken from running timer2.cc on a CSV file of 80000 tuples
 
-pageSize=4000 results: 
+csv2colstore results:
 Time to process with page size 4000: 	3664.503367 s
-Time to process with page size 4000: 	5.486308 s
-Time to process with page size 4000: 	587.516782 s
-
-
-pageSize=8000 results: 
 Time to process with page size 8000: 	1878.900897 s
-Time to process with page size 8000: 	4.389363 s
-Time to process with page size 8000: 	573.470110 s
-
-
-pageSize=8000 varying range results: 
-Time to process with page size 8000: 	0.998375 s
-Time to process with page size 8000: 	1.025188 s
-Time to process with page size 8000: 	1.143705 s
-Time to process with page size 8000: 	187.797503 s
-Time to process with page size 8000: 	2505.714538 s
-Time to process with page size 8000: 	5023.995492 s
-
-
-pageSize=10000 results: 
 Time to process with page size 10000: 	1628.835213 s
-Time to process with page size 10000: 	6.039957 s
-Time to process with page size 10000: 	514.926367 s
-
-
-pageSize=12000 results: 
 Time to process with page size 12000: 	1462.864616 s
-Time to process with page size 12000: 	5.615710 s
-Time to process with page size 12000: 	489.860266 s
+
+select2 results
+Time to process with search range H - JZ and with page size 4000: 	5.486308 s
+Time to process with search range H - JZ and with page size 8000: 	4.389363 s
+Time to process with search range H - JZ and with page size 10000: 	6.039957 s
+Time to process with search range H - JZ and with page size 12000: 	5.615710 s
+
+select3 results
+Time to process with search range H - JZ and with page size 4000: 	587.516782 s
+Time to process with search range H - JZ and with page size 8000: 	573.470110 s
+Time to process with search range H - JZ and with page size 10000: 	514.926367 s
+Time to process with search range H - JZ and with page size 12000: 	489.860266 s
 
 
+select2 results with varying range results: 
+Time to process with search range A - AZ and with page size 8000: 	0.998375 s
+Time to process with search range A - MZ and with page size 8000: 	1.025188 s
+Time to process with search range A - ZZ and with page size 8000: 	1.143705 s
+
+select3 results with varying range results: 
+Time to process with search range A - AZ and with page size 8000: 	187.797503 s
+Time to process with search range A - MZ and with page size 8000: 	2505.714538 s
+Time to process with search range A - ZZ and with page size 8000: 	5023.995492 s
+
+
+
+** Due to memory issues, the csv file used for experiment part 5 had to be reduced in size. The comparisons will try to scale the performance time
+
+Comparison of csv2colstore/csv2heapfile:
+Both of their performance improves as the page size increases. However, csv2colstore takes substantially more time since it has 100 heapfiles to write for each attribute while csv2heapfile writes only to a single heapfile. Thus, even though the CSV file for csv2colstore was smaller, the time it took to process is still longer
+
+
+Comparison of select2/select:
+In both cases of select operations, the variance in time based on page size is still not much since all data must be iterated regardless of how many matches. Between select2 and select, the performance is similar (Taking into account the difference in number of tuples) since colstore does not maximize the amount of tuples stored in a single page. E.g. For page size 16000, 15 tuples can be fit in a page for heapfile and 15 tupleId/attribute pairs can fit into a page of colstore. Thus, roughly the same amount of IOs are made for both selects
+
+In terms of varying range, the time does not vary much because in both cases of select2 and select, we must iterate through the entire set of data regardless of what our range is and no extra IOs are needed when a match is found.
+
+
+Comparison of select3/select2/select:
+Select3 overall performs slower than the other selects since for every match to the start/end, we assume that the tuples are not sequential in database so we must iterate through the return attribute heapfile from the beginning to find the matching tupleId. Thus, more IOs are done for matches found.
+
+For variance in page size, select3 has a similar pattern to select/select2 since all data must be iterated through and the same range means for each select operation means the same number of matches and the same number of IOs to read the return attribute heapfile. Thus, between different page sizes, the IO difference is not as dramatic. 
+
+For variance in range, select3 is the only select operation that does more IO when a match is found since it must iterate through the return attribute heapfile to find the matching tupleId. Thus, its performance gets worse the larger the range is.
 
