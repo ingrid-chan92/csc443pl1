@@ -46,8 +46,9 @@ if __name__ == "__main__":
     for pgsize in range(2,12):
         output = cmd(['./read_fixed_len_page', 'results'+str(pgsize*1000) , str(pgsize*1000)])
         time = output.splitlines()
+        record_num = time[-3].split()
         millisec = time[-1].split()
-        graph_value.append(float(millisec[1]))
+        graph_value.append(float(record_num[-1])/(float(millisec[-1])/1000))
         sleep(5.5)
     
     #+print graph_value 
@@ -56,6 +57,5 @@ if __name__ == "__main__":
 
     #make sure that the threshold line draw *after* the intervals
     plt.plot(x, graph_value, 'bd-')
-    #print "saving graph to %s/threshold_fig%d_n_%d.png" % (data_dir, get_next_id(), num)
     plt.savefig("experiment 3 read graph")
     plt.show()

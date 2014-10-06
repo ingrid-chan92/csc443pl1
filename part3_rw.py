@@ -47,14 +47,16 @@ if __name__ == "__main__":
     for pgsize in range(2,33):
         output = cmd(['./write_fixed_len_pages', 'tuples', 'results', str(pgsize*1000)])
         time = output.splitlines()
+        record_num = time[-3].split()
         millisec = time[-1].split()
-        graph_value_write.append(float(millisec[1]))
+        graph_value_write.append(float(record_num[-1])/(float(millisec[-1])/1000))
         sleep(5.5)
 
         output = cmd(['./read_fixed_len_page', 'results', str(pgsize*1000)])
         time = output.splitlines()
+        record_num = time[-3].split()
         millisec = time[-1].split()
-        graph_value_read.append(float(millisec[1]))
+        graph_value_read.append(float(record_num[-1])/(float(millisec[-1])/1000))
         sleep(5.5)
     
     #+print graph_value 
@@ -64,18 +66,16 @@ if __name__ == "__main__":
     #make sure that the threshold line draw *after* the intervals
     plt.plot(x, graph_value_write, 'bd-')
     plt.xlabel('Page size')
-    plt.ylabel('Delay(ms)')
+    plt.ylabel('Performance(Records/s)')
     plt.title('Page Write Speed')
-    #print "saving graph to %s/threshold_fig%d_n_%d.png" % (data_dir, get_next_id(), num)
     plt.savefig("experiment 3 write graph")
     plt.show()
     plt.close()
 
     plt.plot(x, graph_value_read, 'rd-')
     plt.xlabel('Page size')
-    plt.ylabel('Delay(ms)')
+    plt.ylabel('Performance(Records/s)''Delay(ms)')
     plt.title('Page Read Speed')
-    #print "saving graph to %s/threshold_fig%d_n_%d.png" % (data_dir, get_next_id(), num)
     plt.savefig("experiment 3 read graph")
     plt.show()
     plt.close()
