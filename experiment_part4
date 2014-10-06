@@ -10,12 +10,12 @@ Time to process with page size 12000: 	46.317261 s
 
 
 Select results w/ varying page size: 
-Time to process with search range J - JZ and with page size 2000: 	7.250361 s
-Time to process with search range J - JZ and with page size 4000: 	6.724728 s 
-Time to process with search range J - JZ and with page size 6000: 	6.361123 s
-Time to process with search range J - JZ and with page size 8000: 	6.237534 s
-Time to process with search range J - JZ and with page size 10000: 	6.190604 s
-Time to process with search range J - JZ and with page size 12000: 	6.023810 s
+Time to process with search range H - JZ and with page size 2000: 	7.250361 s
+Time to process with search range H - JZ and with page size 4000: 	6.724728 s 
+Time to process with search range H - JZ and with page size 6000: 	6.361123 s
+Time to process with search range H - JZ and with page size 8000: 	6.237534 s
+Time to process with search range H - JZ and with page size 10000: 	6.190604 s
+Time to process with search range H - JZ and with page size 12000: 	6.023810 s
 
 
 Select results w/ varying search range: 
@@ -25,8 +25,8 @@ Time to process with search range A - ZZ and page size 4000: 	6.599281 s
 
 
 CSV2HEAPFILE:
-When page size increases, the performance definitively improves. With a larger page size, more data can be fit into a single page before it needs to be written into memory thus, less IOs are needed.
+When page size increases, the performance improves. With a larger page size, more data can be fit into a single page before it needs to be written into memory thus, less IOs are needed.
 
 
 SELECT:
-Unlike Csv2Heapfile, both varying page size and start/end does not effect the performance much because this implementation of SELECT has no optimization so must do a linear search with all the data every time. For varying page size, there is a slight improvement in performance because less IOs are needed to iterate through all the data. However, for search range where all the data must be iterated regardless, there is no dramatic change in performance.
+Unlike Csv2Heapfile, both varying page size and start/end does not effect the performance much because this implementation of SELECT has no optimization so it must do a linear search with all the data every time. For varying page size, there is a slight improvement in performance because less IOs are needed to iterate through all the data. However, for search range where all the data must be iterated regardless, there is no dramatic change in performance.
