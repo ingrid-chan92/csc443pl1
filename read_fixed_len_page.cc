@@ -19,6 +19,9 @@ int main(int argc, char *argv[])
 	int readNumber = 0;
 	char *target_ptr;
 
+	int recordCount=0;
+	int pageCount=0;
+
 	timeval tim;
 	gettimeofday(&tim, NULL);
 	double t1=tim.tv_sec+(tim.tv_usec/1000000.0);
@@ -50,15 +53,18 @@ int main(int argc, char *argv[])
 						printf("\n");
 					}
 				}
-				
+				recordCount++;
 				free_record(&csvRecord);
 			}
 		}
+		pageCount++;
 	}
 
 	gettimeofday(&tim, NULL);
 	double t2=tim.tv_sec+(tim.tv_usec/1000000.0);
 
+	printf("NUMBER OF RECORDS: %d \n", recordCount);
+	printf("NUMBER OF PAGES: %d \n", pageCount);
 	printf("TIME: %f \n", (t2-t1)*1000);
 	fclose(pageFile);
 	//free(pageFile);
