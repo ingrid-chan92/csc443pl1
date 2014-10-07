@@ -26,8 +26,16 @@ c1hongxu
 	- scan.cc
 	- select.cc
 	- update.cc
-	- timer.cc
-	- bigCsv.csv
+	- timer.cc, used to compute results for experiment. Included for reference
+- Notes
+	- Pages start at 1. 0th page is reserved for the directory
+	- The value passed in as the record_id for delete and update is [page id][last five digits as slotId] so 100012 represents page 1, slot 12. 
 
 5:
-- Relevant files
+- Relevant files:
+	- csv2colstore.cc
+	- select2.cc
+	- select3.cc
+	- timer2.cc, used to compute results for experiment. Included for reference
+
+
